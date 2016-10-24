@@ -1,0 +1,1 @@
+files to test the RHT03 ambient temperature and humidity sensor
