@@ -6,3 +6,7 @@
 #define CALIBRATE_STATE 5
 #define SHUTDOWN_STATE 6
 
+
+#define phReceivePin 2
+#define phTransmitPin 3
+
