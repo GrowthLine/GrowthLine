@@ -33,9 +33,16 @@ void loop() {
   }
   
   void mainMenu() {
-    fillRect( 20, 20,120, 80, ILI9341_GREEN);
+    fillRect( 20, 20,120, 80, ILI9341_GREEN );
     fillRect(170, 20,120, 80, ILI9341_YELLOW);
     fillRect( 20,140,120, 80, ILI9341_ORANGE);
+    setCursor( 50, 50);
+    setTextColor( ILI9341_BLACK, ILI9341_GREEN);
+    
+  }
+  
+  void warmUpScreen() {
+    fillRect( 20, 20,120, 80, ILI9341_YELLOW);
   }
 
 }
