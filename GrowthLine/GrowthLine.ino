@@ -78,6 +78,36 @@ void configureSensors() {
   outpH.reserve(10);
   inpH.reserve(30);
   phSerial.begin(9600);
-
 }
+
+Reading::Reading() {
+  Reading( 0, 0, 0, 0, 0, 0);
+}
+
+Reading::Reading( float l, float aT, float h, float ph, float gT, float m ) {
+  lux = l;
+  airTemperature = aT;
+  humidity = h;
+  pH = ph;
+  groundTemperature = gT;
+  moisture = m;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

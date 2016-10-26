@@ -11,3 +11,18 @@
 #define phTransmitPin 3
 #define tempHumidPin 5
 
+class Reading {
+  public:
+    float lux;
+    float airTemperature;
+    float humidity;
+    float pH;
+    float groundTemperature;
+    float moisture;
+
+    Reading( float l, float aT, float h, float ph, float gT, float m );
+    Reading();
+    
+  private:
+};
+
