@@ -9,4 +9,5 @@
 
 #define phReceivePin 2
 #define phTransmitPin 3
+#define tempHumidPin 5
 
