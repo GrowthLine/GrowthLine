@@ -12,7 +12,7 @@
 
 // Variable Declarations
 Adafruit_TSL2561_Unified luxSensor = Adafruit_TSL2561_Unified(TSL2561_ADDR_FLOAT, 12345); // Lux Sensorint
-int deviceState;        // State of device
+int deviceState = READY_STATE;        // State of device
 
 void setup() {
   Serial.begin(9600);

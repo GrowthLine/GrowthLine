@@ -17,7 +17,7 @@
 // Released to the public domain
 //
 
-#include <dht.h>
+#include "dht.h"
 
 dht DHT;
 
@@ -37,7 +37,7 @@ struct
 
 void setup()
 {
-    Serial.begin(115200);
+    Serial.begin(9600);
     Serial.println("dht22_test.ino");
     Serial.print("LIBRARY VERSION: ");
     Serial.println(DHT_LIB_VERSION);
