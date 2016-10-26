@@ -1,0 +1,1 @@
+Lux Sensor works. Accuracy was not tested.
