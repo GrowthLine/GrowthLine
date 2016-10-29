@@ -21,14 +21,6 @@ void setup() {
   sensors[1] = new TempHumid(&reading, tempHumidPin);
   sensors[2] = new pH(&reading, phReceivePin, phTransmitPin);
   sensors[3] = new TempMoist(&reading, -1, -1);     // TempMoist Class not done
-
-//  sensors[0]->setUp();
-//  Serial.println("Setup 0 is complete");
-//  sensors[1]->setUp();
-//  Serial.println("Setup 1 is complete");
-//  sensors[2]->setUp();
-//  Serial.println("Setup 2 is complete");
-//  sensors[3]->setUp();
   
   /* Setup the sensors */
   for (int i = 0; i < totalSensors; i++)
