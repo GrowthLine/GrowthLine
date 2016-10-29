@@ -5,23 +5,32 @@
 #include <Adafruit_ILI9341.h>
 
 /* Variable Declarations */
-int deviceState ;                        // State of device
+int deviceState;                        // State of device
+const int totalSensors = 4;
 
 Reading reading;
+Sensor *sensors[totalSensors];
 LightSensor lux(&reading);
 
 void setup() {
   Serial.begin(9600);
   deviceState = READY_STATE;
-  // Testing
-  lux.setUp();
+
+  /* Add the sensors to our array of Sensors */
+  sensors[0] = new LightSensor(&reading);
+  sensors[1] = new TempHumid(&reading, tempHumidPin);
+  sensors[2] = new pH(&reading, phReceivePin, phTransmitPin);
+  sensors[4] = new TempMoist(&reading, -1, -1);     // TempMoist Class not done
+
+  /* Setup the sensors */
+  for(int i=0; i < totalSensors; i++)
+    sensors[i]->setUp();
   Serial.println("Setup is complete");
 }
 
 void loop() {
   switch (deviceState) {
     case READY_STATE:
-
       //mainMenu();
       break;
     case WARMUP_STATE:

@@ -37,7 +37,7 @@ class Sensor {
 };
 
 /* Light sensor class */
-class LightSensor : Sensor {
+class LightSensor : public Sensor {
   public:
     Adafruit_TSL2561_Unified luxSensor = Adafruit_TSL2561_Unified(TSL2561_ADDR_FLOAT, 12345);
 
@@ -48,7 +48,7 @@ class LightSensor : Sensor {
 };
 
 /* Air Temperature/Humidity Class */
-class TempHumid : Sensor {
+class TempHumid : public Sensor {
     int pin;
     dht DHT;
     int err;
@@ -60,7 +60,7 @@ class TempHumid : Sensor {
 };
 
 /* pH Sensor Class */
-class pH : Sensor {
+class pH : public Sensor {
   int rx;
   int tx;
   SoftwareSerial *serial;
@@ -72,7 +72,7 @@ class pH : Sensor {
 };
 
 /* Ground Temperature/Moisture Class */  // Not Done Yet
-class TempMoist : Sensor {
+class TempMoist : public Sensor {
   int dataPin;
   int clockPin;
   public:

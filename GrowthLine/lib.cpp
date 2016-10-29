@@ -50,7 +50,7 @@ void TempHumid::read() {
   reading->airTemperature = DHT.temperature;
 }
 
-void setUp() {}
+void TempHumid::setUp() {}
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~ pH Sensor ~~~~~~~~~~~~~~~~~~~~~~~ */
 
@@ -76,7 +76,7 @@ void pH::read() {
   reading->pH = sensorString.toFloat();
 }
 
-void pH::setUp() {}
+void pH::setUp() {return;}
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~ Temperatue / Moisture Class ~~~~~~~~~~~~~~~~~~~~~~~ */  // Not done Yet
 TempMoist::TempMoist(Reading *r, int d, int c) {
