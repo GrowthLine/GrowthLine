@@ -20,15 +20,31 @@ void setup() {
   sensors[0] = new LightSensor(&reading);
   sensors[1] = new TempHumid(&reading, tempHumidPin);
   sensors[2] = new pH(&reading, phReceivePin, phTransmitPin);
-  sensors[4] = new TempMoist(&reading, -1, -1);     // TempMoist Class not done
+  sensors[3] = new TempMoist(&reading, -1, -1);     // TempMoist Class not done
 
+//  sensors[0]->setUp();
+//  Serial.println("Setup 0 is complete");
+//  sensors[1]->setUp();
+//  Serial.println("Setup 1 is complete");
+//  sensors[2]->setUp();
+//  Serial.println("Setup 2 is complete");
+//  sensors[3]->setUp();
+  
   /* Setup the sensors */
-  for(int i=0; i < totalSensors; i++)
+  for (int i = 0; i < totalSensors; i++)
     sensors[i]->setUp();
   Serial.println("Setup is complete");
 }
 
 void loop() {
+  for ( int i = 0; i < totalSensors; i++)
+    sensors[i]->read();
+  Serial.print("The lux is: "); Serial.println(reading.lux);
+  Serial.print("The air temperature is: "); Serial.println(reading.airTemperature);
+  Serial.print("The humidity is: "); Serial.println(reading.humidity);
+  Serial.print("The pH is: "); Serial.println(reading.pH);
+  Serial.println("\n\n");
+  delay(5000);
   switch (deviceState) {
     case READY_STATE:
       //mainMenu();
