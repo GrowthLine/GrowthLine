@@ -21,3 +21,10 @@
 #define TS_MINY 130
 #define TS_MAXX 3800
 #define TS_MAXY 4000
+
+// Button constants
+#define BTN_NONE 0
+#define BTN_NW   1
+#define BTN_NE   2
+#define BTN_SW   3
+#define BTN_SE   4
