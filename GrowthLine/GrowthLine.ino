@@ -1,8 +1,9 @@
 #include "GrowthLine.h"
 #include "lib.h"
 
-/* Library needed for Touch LCD */
+/* Libraries needed for Touch LCD */
 #include <Adafruit_ILI9341.h>
+#include <Adafruit_STMPE610.h>
 
 /* Variable Declarations */
 int deviceState, button;                        // State of device
