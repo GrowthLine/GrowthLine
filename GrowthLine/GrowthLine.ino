@@ -5,7 +5,7 @@
 #include <Adafruit_ILI9341.h>
 
 /* Variable Declarations */
-int deviceState;                        // State of device
+int deviceState, button;                        // State of device
 const int totalSensors = 4;
 
 Reading reading;
@@ -16,6 +16,7 @@ Adafruit_ILI9341 display;
 void setup() {
   Serial.begin(9600);
   deviceState = READY_STATE;
+  button = BTN_NONE;
 
   /* Add the sensors to our array of Sensors */
   sensors[0] = new LightSensor(&reading);
@@ -35,7 +36,8 @@ void setup() {
 void loop() {
   switch (deviceState) {
     case READY_STATE:
-      //mainMenu();
+      // draw_MainMenu();
+      // button = check_MainMenu();
       break;
     case WARMUP_STATE:
       break;
