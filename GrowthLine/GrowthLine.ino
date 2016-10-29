@@ -74,6 +74,9 @@ TS_Point getTouch() {
 }
 
 void draw_MainMenu() {
+  // Blank screen
+  tft.fillScreen(ILI9341_BLACK);
+  // Draw boxes
   tft.fillRect( 20, 20, 120, 80, ILI9341_GREEN );
   tft.fillRect(170, 20, 120, 80, ILI9341_YELLOW);
   tft.fillRect( 20, 140, 120, 80, ILI9341_ORANGE);
@@ -94,26 +97,33 @@ void draw_MainMenu() {
 int check_MainMenu() {
   TS_Point p = getTouch();
   if (p==null) {
-    return;
+    return BTN_NONE;
   }
   // First button check: 'Read'
   if ((p.x >=  20 && p.x <= 140) && (p.y >=  20 && p.y <= 100)) {
-    return 1;
+    return BTN_NW;
   }
   // Second button check: 'Menu'
   if ((p.x >= 170 && p.x <= 290) && (p.y >=  20 && p.y <= 100)) {
-    return 2;
+    return BTN_NE;
   }
   // Third button check: 'Save'
   if ((p.x >=  20 && p.x <= 140) && (p.y >= 140 && p.y <= 260)) {
-    return 3;
+    return BTN_SW;
   }
-  return 0;
+  return BTN_NONE;
    
 }
 
 void draw_WarmUpScreen() {
+  // Blank screen
+  tft.fillScreen(ILI9341_BLACK);
+  // Draw box
   tft.fillRect( 20, 20, 120, 80, ILI9341_YELLOW);
+  // Draw text
+  tft.setCursor( 40, 50);
+  tft.setTextColor( ILI9341_BLACK, ILI9341_YELLOW);
+  tft.println("Warming up");
 }
 
 
