@@ -1,30 +1,14 @@
 #include "GrowthLine.h"
 #include "lib.h"
 
-/* Library needed for Temperature/Moisture Sensor (SHT10)  */
-#include <SHT1x.h>
-
 /* Library needed for Touch LCD */
 #include <Adafruit_ILI9341.h>
 
-/* Librariy for pH circuit */
-#include <SoftwareSerial.h>
-
-/* Dependencies to the Temp/Humid DHT03 Sensor */
-#include "dht.h"
-
 /* Variable Declarations */
-//dht tempHumidsensor;                  // Temperatue & Humid Sensor (DHT03)
-//SoftwareSerial phSerial( phReceivePin, phTransmitPin);    // Serial of the pH Sensor
 int deviceState ;                        // State of device
-//String outpH = "";                    // Message that will be given to the pH sensor
-//String inpH = "";                     // hold the message incoming from the pH sensor
-
-
 
 Reading reading;
 LightSensor lux(&reading);
-
 
 void setup() {
   Serial.begin(9600);
@@ -35,14 +19,8 @@ void setup() {
 }
 
 void loop() {
-  lux.read();
-  Serial.print("lux: ");
-  Serial.println( reading.lux );
-  delay(1000);
   switch (deviceState) {
     case READY_STATE:
-
-
 
       //mainMenu();
       break;
@@ -62,15 +40,6 @@ void loop() {
       break;
   }
 }
-
-
-//void configureSensors() {
-//
-//  /* Configure pH Sensor */
-//  outpH.reserve(10);
-//  inpH.reserve(30);
-//  phSerial.begin(9600);
-//}
 
 
 //void mainMenu() {
