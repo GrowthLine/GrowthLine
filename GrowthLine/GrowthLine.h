@@ -11,4 +11,6 @@
 #define phTransmitPin 3
 #define tempHumidPin 5
 
+#define TFT_DC 9
+#define TFT_CS 10
 
