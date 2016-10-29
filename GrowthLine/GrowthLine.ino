@@ -12,7 +12,8 @@ const int totalSensors = 4;
 Reading reading;
 Sensor *sensors[totalSensors];
 LightSensor lux(&reading);
-Adafruit_ILI9341 display;
+Adafruit_ILI9341 tft;
+Adafruit_STMPE610 ts;
 
 void setup() {
   Serial.begin(9600);
@@ -26,6 +27,8 @@ void setup() {
   sensors[4] = new TempMoist(&reading, -1, -1);     // TempMoist Class not done
   
   tft = new Adafruit_ILI9341(TFT_CS, TFT_DC);
+  ts  = new Adafruit_STMPE610(STMPE_CS);
+
 
   /* Setup the sensors */
   for(int i=0; i < totalSensors; i++)
