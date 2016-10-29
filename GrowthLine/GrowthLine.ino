@@ -55,17 +55,17 @@ void loop() {
 }
 
 
-//void mainMenu() {
-//  fillRect( 20, 20, 120, 80, ILI9341_GREEN );
-//  fillRect(170, 20, 120, 80, ILI9341_YELLOW);
-//  fillRect( 20, 140, 120, 80, ILI9341_ORANGE);
-//  setCursor( 50, 50);
-//  setTextColor( ILI9341_BLACK, ILI9341_GREEN);
-//}
-//
-//void warmUpScreen() {
-//  fillRect( 20, 20, 120, 80, ILI9341_YELLOW);
-//}
+void mainMenu() {
+  tft.fillRect( 20, 20, 120, 80, ILI9341_GREEN );
+  tft.fillRect(170, 20, 120, 80, ILI9341_YELLOW);
+  tft.fillRect( 20, 140, 120, 80, ILI9341_ORANGE);
+  tft.setCursor( 50, 50);
+  tft.setTextColor( ILI9341_BLACK, ILI9341_GREEN);
+}
+
+void warmUpScreen() {
+  tft.fillRect( 20, 20, 120, 80, ILI9341_YELLOW);
+}
 
 
 
