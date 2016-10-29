@@ -10,7 +10,9 @@
 #define phReceivePin 2
 #define phTransmitPin 3
 #define tempHumidPin 5
-
+// For the touch controller
+#define STMPE_CS 8
+// For the TFT screen
 #define TFT_DC 9
 #define TFT_CS 10
 
