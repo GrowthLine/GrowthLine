@@ -23,11 +23,12 @@ void setup() {
   sensors[2] = new pH(&reading, phReceivePin, phTransmitPin);
   sensors[4] = new TempMoist(&reading, -1, -1);     // TempMoist Class not done
   
-  display = new Adafruit_ILI9341(TFT_CS, TFT_DC);
+  tft = new Adafruit_ILI9341(TFT_CS, TFT_DC);
 
   /* Setup the sensors */
   for(int i=0; i < totalSensors; i++)
     sensors[i]->setUp();
+  tft.begin();
   Serial.println("Setup is complete");
 }
 
