@@ -1,0 +1,283 @@
+Reading 2 - More Inside
+
+Setup is complete
+The lux is: 11946.00
+The air temperature is: 28.20
+The humidity is: 39.70
+The pH is: 0.00
+
+
+
+The lux is: 12041.00
+The air temperature is: 28.70
+The humidity is: 38.40
+The pH is: 0.00
+
+
+
+The lux is: 12074.00
+The air temperature is: 28.70
+The humidity is: 38.30
+The pH is: 0.00
+
+
+
+The lux is: 12079.00
+The air temperature is: 28.60
+The humidity is: 38.20
+The pH is: 0.00
+
+
+
+The lux is: 12077.00
+The air temperature is: 28.70
+The humidity is: 38.10
+The pH is: 0.00
+
+
+
+The lux is: 12061.00
+The air temperature is: 28.70
+The humidity is: 38.00
+The pH is: 0.00
+
+
+
+The lux is: 12096.00
+The air temperature is: 28.70
+The humidity is: 38.00
+The pH is: 0.00
+
+
+
+The lux is: 12096.00
+The air temperature is: 28.80
+The humidity is: 38.00
+The pH is: 0.00
+
+
+
+The lux is: 12103.00
+The air temperature is: 28.80
+The humidity is: 38.00
+The pH is: 0.00
+
+
+
+The lux is: 12088.00
+The air temperature is: 28.80
+The humidity is: 38.10
+The pH is: 0.00
+
+
+
+The lux is: 12107.00
+The air temperature is: 28.80
+The humidity is: 38.00
+The pH is: 0.00
+
+
+
+The lux is: 12102.00
+The air temperature is: 28.80
+The humidity is: 37.90
+The pH is: 0.00
+
+
+
+The lux is: 12102.00
+The air temperature is: 28.90
+The humidity is: 37.90
+The pH is: 0.00
+
+
+
+The lux is: 12103.00
+The air temperature is: 28.90
+The humidity is: 37.80
+The pH is: 0.00
+
+
+
+The lux is: 12106.00
+The air temperature is: 28.90
+The humidity is: 37.80
+The pH is: 0.00
+
+
+
+The lux is: 12118.00
+The air temperature is: 28.90
+The humidity is: 37.80
+The pH is: 0.00
+
+
+
+The lux is: 12099.00
+The air temperature is: 29.00
+The humidity is: 37.80
+The pH is: 0.00
+
+
+
+The lux is: 12073.00
+The air temperature is: 28.90
+The humidity is: 37.80
+The pH is: 0.00
+
+
+
+The lux is: 12096.00
+The air temperature is: 29.00
+The humidity is: 37.80
+The pH is: 0.00
+
+
+
+The lux is: 12109.00
+The air temperature is: 29.00
+The humidity is: 37.80
+The pH is: 0.00
+
+
+
+The lux is: 12117.00
+The air temperature is: 29.00
+The humidity is: 37.80
+The pH is: 0.00
+
+
+
+The lux is: 12054.00
+The air temperature is: 29.10
+The humidity is: 37.70
+The pH is: 0.00
+
+
+
+The lux is: 12117.00
+The air temperature is: 29.10
+The humidity is: 37.70
+The pH is: 0.00
+
+
+
+The lux is: 12117.00
+The air temperature is: 29.10
+The humidity is: 37.60
+The pH is: 0.00
+
+
+
+The lux is: 12094.00
+The air temperature is: 29.10
+The humidity is: 37.50
+The pH is: 0.00
+
+
+
+The lux is: 12094.00
+The air temperature is: 29.20
+The humidity is: 37.30
+The pH is: 0.00
+
+
+
+The lux is: 12127.00
+The air temperature is: 29.20
+The humidity is: 37.30
+The pH is: 0.00
+
+
+
+The lux is: 12133.00
+The air temperature is: 29.20
+The humidity is: 37.30
+The pH is: 0.00
+
+
+
+The lux is: 12111.00
+The air temperature is: 29.20
+The humidity is: 37.20
+The pH is: 0.00
+
+
+
+The lux is: 12111.00
+The air temperature is: 29.20
+The humidity is: 37.10
+The pH is: 0.00
+
+
+
+The lux is: 12112.00
+The air temperature is: 29.30
+The humidity is: 37.10
+The pH is: 0.00
+
+
+
+The lux is: 12110.00
+The air temperature is: 29.30
+The humidity is: 37.20
+The pH is: 0.00
+
+
+
+The lux is: 12134.00
+The air temperature is: 29.30
+The humidity is: 37.20
+The pH is: 0.00
+
+
+
+The lux is: 12140.00
+The air temperature is: 29.30
+The humidity is: 37.10
+The pH is: 0.00
+
+
+
+The lux is: 12138.00
+The air temperature is: 29.30
+The humidity is: 37.20
+The pH is: 0.00
+
+
+
+The lux is: 12140.00
+The air temperature is: 29.30
+The humidity is: 37.20
+The pH is: 0.00
+
+
+
+The lux is: 12137.00
+The air temperature is: 29.30
+The humidity is: 37.10
+The pH is: 0.00
+
+
+
+The lux is: 12126.00
+The air temperature is: 29.30
+The humidity is: 37.00
+The pH is: 0.00
+
+
+
+The lux is: 12126.00
+The air temperature is: 29.40
+The humidity is: 37.00
+The pH is: 0.00
+
+
+
+The lux is: 12092.00
+The air temperature is: 29.40
+The humidity is: 37.00
+The pH is: 0.00
+
+
+
