@@ -7,13 +7,13 @@
 #include <SHT1x.h>
 
 // Specify data and clock connections and instantiate SHT1x object
-#define dataPin  10
-#define clockPin 11
+#define dataPin  12
+#define clockPin 13
 SHT1x sht1x(dataPin, clockPin);
 
 void setup()
 {
-   Serial.begin(38400); // Open serial connection to report values to host
+   Serial.begin(9600); // Open serial connection to report values to host
    Serial.println("Starting up");
 }
 

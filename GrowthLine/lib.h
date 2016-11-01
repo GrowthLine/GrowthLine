@@ -75,6 +75,7 @@ class pH : public Sensor {
 class TempMoist : public Sensor {
   int dataPin;
   int clockPin;
+  SHT1x *sht1x;
   public:
     TempMoist(Reading *r, int d, int c);
     ~TempMoist();

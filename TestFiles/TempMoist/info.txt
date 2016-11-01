@@ -1,1 +1,8 @@
 Files to test the SHT10 Soil Temperature and Moisture sensor
+
+Red - VCC
+Green - Ground
+Yellow - Clock
+Blue - Data
+
+Must connect a 10k resistor between Blue (data) and Vcc.

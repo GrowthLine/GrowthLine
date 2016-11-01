@@ -20,7 +20,7 @@ void setup() {
   sensors[0] = new LightSensor(&reading);
   sensors[1] = new TempHumid(&reading, tempHumidPin);
   sensors[2] = new pH(&reading, phReceivePin, phTransmitPin);
-  sensors[3] = new TempMoist(&reading, -1, -1);     // TempMoist Class not done
+  sensors[3] = new TempMoist(&reading, 12, 13);     // TempMoist Class not done
   
   /* Setup the sensors */
   for (int i = 0; i < totalSensors; i++)
@@ -35,6 +35,8 @@ void loop() {
   Serial.print("The air temperature is: "); Serial.println(reading.airTemperature);
   Serial.print("The humidity is: "); Serial.println(reading.humidity);
   Serial.print("The pH is: "); Serial.println(reading.pH);
+  Serial.print("The ground temperature is: "); Serial.println(reading.groundTemperature);
+  Serial.print("The moisture is: "); Serial.println(reading.moisture);
   Serial.println("\n\n");
   delay(5000);
   switch (deviceState) {

@@ -83,12 +83,14 @@ TempMoist::TempMoist(Reading *r, int d, int c) {
   reading = r;
   dataPin = d;
   clockPin = c;
+  sht1x = new SHT1x(dataPin, clockPin);
 }
 
 TempMoist::~TempMoist() {}
 
 void TempMoist::read() {
-  
+  reading->groundTemperature = sht1x->readTemperatureC();
+  reading->moisture = sht1x->readHumidity();
 }
 
 void TempMoist::setUp() {
