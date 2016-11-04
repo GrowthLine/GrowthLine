@@ -10,7 +10,7 @@ const int totalSensors = 4;
 
 Reading reading;
 Sensor *sensors[totalSensors];
-LightSensor lux(&reading);
+
 
 void setup() {
   Serial.begin(9600);
