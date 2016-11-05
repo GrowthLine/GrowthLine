@@ -127,26 +127,29 @@ void draw_MainMenu() {
 }
 
 int check_MainMenu() {
+  uint16_t x, y;
+  uint8_t z;
   if (ts->bufferEmpty()) {
     //Serial.println("No button press.\n");
     return BTN_NONE;
   }
-  p = &ts->getPoint();
+  ts->readData(&x, &y, &z);
+  
   
   // Scale the coordinates
-  p->x = map(p->x, TS_MINX, TS_MAXX, 0, tft->width());
-  p->y = map(p->y, TS_MINY, TS_MAXY, 0, tft->height());
+  x = map(x, TS_MINX, TS_MAXX, 0, tft->width());
+  y = map(y, TS_MINY, TS_MAXY, 0, tft->height());
   
   // First button check: 'Read'
-  if ((p->x >=  20 && p->x <= 140) && (p->y >=  20 && p->y <= 100)) {
+  if ((x >=  20 && x <= 140) && (y >=  20 && y <= 100)) {
     return BTN_NW;
   }
   // Second button check: 'Menu'
-  if ((p->x >= 170 && p->x <= 290) && (p->y >=  20 && p->y <= 100)) {
+  if ((x >= 170 && x <= 290) && (y >=  20 && y <= 100)) {
     return BTN_NE;
   }
   // Third button check: 'Save'
-  if ((p->x >=  20 && p->x <= 140) && (p->y >= 140 && p->y <= 260)) {
+  if ((x >=  20 && x <= 140) && (y >= 140 && y <= 260)) {
     return BTN_SW;
   }
   return BTN_NONE;
