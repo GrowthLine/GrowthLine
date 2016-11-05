@@ -1,47 +1,64 @@
-#include "GrowthLine.h"
 #include "lib.h"
 
-/* Library needed for Touch LCD */
-#include <Adafruit_ILI9341.h>
-
 /* Variable Declarations */
-int deviceState;                        // State of device
-const int totalSensors = 4;
+uint8_t deviceState;                        // State of device
+const uint8_t NUMBER_OF_READINGS = 5;
 
-Reading reading;
-Sensor *sensors[totalSensors];
+QueueList<Reading*> readings;
+Sensors sensors;
 
+Adafruit_STMPE610 touch = Adafruit_STMPE610(8);
 
 void setup() {
   Serial.begin(9600);
+  readings.setPrinter(Serial);
   deviceState = READY_STATE;
 
-  /* Add the sensors to our array of Sensors */
-  sensors[0] = new LightSensor(&reading);
-  sensors[1] = new TempHumid(&reading, tempHumidPin);
-  sensors[2] = new pH(&reading, phReceivePin, phTransmitPin);
-  sensors[3] = new TempMoist(&reading, 12, 13);     // TempMoist Class not done
-  
+  /* Add the sensors to our Sensors object */
+  sensors.addSensor(new LightSensor());
+  sensors.addSensor(new TempHumid(TEMP_HUMID_PIN));
+  sensors.addSensor(new pH(PH_RECEIVE_PIN, PH_TRANSMIT_PIN));
+  sensors.addSensor(new TempMoist(TEMP_MOIST_DATA_PIN, TEMP_MOIST_CLOCK_PIN));     // TempMoist Class not done
+
   /* Setup the sensors */
-  for (int i = 0; i < totalSensors; i++)
-    sensors[i]->setUp();
+  sensors.setupSensors();
+
+  pinMode(10, OUTPUT);
+  if (! touch.begin()) {
+    Serial.println("STMPE not found!");
+    while (1);
+  }
   Serial.println("Setup is complete");
 }
 
 void loop() {
-  for ( int i = 0; i < totalSensors; i++)
-    sensors[i]->read();
-  Serial.print("The lux is: "); Serial.println(reading.lux);
-  Serial.print("The air temperature is: "); Serial.println(reading.airTemperature);
-  Serial.print("The humidity is: "); Serial.println(reading.humidity);
-  Serial.print("The pH is: "); Serial.println(reading.pH);
-  Serial.print("The ground temperature is: "); Serial.println(reading.groundTemperature);
-  Serial.print("The moisture is: "); Serial.println(reading.moisture);
-  Serial.println("\n\n");
+  uint16_t x, y;
+  uint8_t z;
+  if ( touch.touched()) {
+    while (! touch.bufferEmpty() ) {
+      Serial.print(touch.bufferSize());
+      touch.readData(&x, &y, &z);
+      Serial.print("->(");
+      Serial.print(x); Serial.print(", ");
+      Serial.print(y); Serial.print(", ");
+      Serial.print(z);
+      Serial.println(")\n\n");
+    }
+    touch.writeRegister8(STMPE_INT_STA, 0xFF);
+  }
   delay(5000);
   switch (deviceState) {
     case READY_STATE:
-      //mainMenu();
+      if (readings.count() > NUMBER_OF_READINGS)
+        readings.pop();
+      readings.push( sensors.getReading() );
+
+      Serial.print("The lux is: "); Serial.println(readings.peek()->lux);
+      Serial.print("The air temperature is: "); Serial.println(readings.peek()->airTemperature);
+      Serial.print("The humidity is: "); Serial.println(readings.peek()->humidity);
+      Serial.print("The pH is: "); Serial.println(readings.peek()->pH);
+      Serial.print("The ground temperature is: "); Serial.println(readings.peek()->groundTemperature);
+      Serial.print("The moisture is: "); Serial.println(readings.peek()->moisture);
       break;
     case WARMUP_STATE:
       break;
