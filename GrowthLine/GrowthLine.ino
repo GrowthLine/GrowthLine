@@ -2,7 +2,7 @@
 
 /* Variable Declarations */
 uint8_t deviceState;                        // State of device
-const uint8_t NUMBER_OF_READINGS = 5;
+const uint8_t NUMBER_OF_READINGS = 5;       // Number of readings we will hold before discarding old one
 
 QueueList<Reading*> readings;
 Sensors sensors;
@@ -18,11 +18,12 @@ void setup() {
   sensors.addSensor(new LightSensor());
   sensors.addSensor(new TempHumid(TEMP_HUMID_PIN));
   sensors.addSensor(new pH(PH_RECEIVE_PIN, PH_TRANSMIT_PIN));
-  sensors.addSensor(new TempMoist(TEMP_MOIST_DATA_PIN, TEMP_MOIST_CLOCK_PIN));     // TempMoist Class not done
+  sensors.addSensor(new TempMoist(TEMP_MOIST_DATA_PIN, TEMP_MOIST_CLOCK_PIN));
 
   /* Setup the sensors */
   sensors.setupSensors();
 
+  // Screen Stuff Test. Will be removed and replaced by Andrew's Code
   pinMode(10, OUTPUT);
   if (! touch.begin()) {
     Serial.println("STMPE not found!");
@@ -32,6 +33,7 @@ void setup() {
 }
 
 void loop() {
+  // Screen Stuff Test. Will be removed and replaced by Andrew's Code
   uint16_t x, y;
   uint8_t z;
   if ( touch.touched()) {
@@ -46,13 +48,11 @@ void loop() {
     }
     touch.writeRegister8(STMPE_INT_STA, 0xFF);
   }
-  delay(5000);
   switch (deviceState) {
     case READY_STATE:
       if (readings.count() > NUMBER_OF_READINGS)
         readings.pop();
       readings.push( sensors.getReading() );
-
       Serial.print("The lux is: "); Serial.println(readings.peek()->lux);
       Serial.print("The air temperature is: "); Serial.println(readings.peek()->airTemperature);
       Serial.print("The humidity is: "); Serial.println(readings.peek()->humidity);
@@ -75,6 +75,7 @@ void loop() {
     default:
       break;
   }
+  delay(5000);
 }
 
 
