@@ -67,6 +67,7 @@ pH::pH(uint8_t re, uint8_t t) {
   tx = t;
   serial = new SoftwareSerial(rx, tx);
   serial->begin(9600);
+  serial->print("RESPONSE,0\r");        //Disables status responses
 }
 
 pH::~pH() {}
@@ -74,13 +75,15 @@ pH::~pH() {}
 void pH::read() {
   serial->print("R\r");
   String sensorString = "";
-  delay(20);
   while ( serial->available() > 0 ) {
     char inchar = (char)serial->read();
     if (inchar == '\r')
       break;
     sensorString += inchar;
   }
+  while( serial->available() > 0)     // Clears the buffer
+    serial->read();
+  
   reading->pH = sensorString.toFloat();
 }
 

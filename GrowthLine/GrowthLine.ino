@@ -59,6 +59,7 @@ void loop() {
       Serial.print("The pH is: "); Serial.println(readings.peek()->pH);
       Serial.print("The ground temperature is: "); Serial.println(readings.peek()->groundTemperature);
       Serial.print("The moisture is: "); Serial.println(readings.peek()->moisture);
+      Serial.println("\n\n");
       break;
     case WARMUP_STATE:
       break;
@@ -75,7 +76,7 @@ void loop() {
     default:
       break;
   }
-  delay(5000);
+  delay(1000);
 }
 
 
