@@ -28,3 +28,8 @@
 #define BTN_NE   2
 #define BTN_SW   3
 #define BTN_SE   4
+#define BTN_TOPLEFT   1
+#define BTN_TOPRIGHT  2
+#define BTN_LIST_1    3
+#define BTN_LIST_2    4
+#define BTN_LIST_3    5

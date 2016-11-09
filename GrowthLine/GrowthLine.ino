@@ -23,7 +23,6 @@ void setup() {
   Serial.begin(9600);
   deviceState   = READY_STATE;
   button        = BTN_NONE;
-  redraw        = true;
   have_readings = false;
 
   /* Add the sensors to our array of Sensors */
@@ -48,7 +47,9 @@ void setup() {
       Serial.println("Touchscreen controller start failure!");
     }
   }
+  tft->begin();
   tft->setRotation(1);
+  redraw = true;
   Serial.println("Setup is complete");
 }
 
@@ -94,7 +95,10 @@ void loop() {
     case SAVE_STATE:
       break;
     case MENU_STATE:
-      draw_MenuScreen();
+      if (redraw) {
+        draw_MenuScreen();
+        redraw = false;
+      }
       break;
     case CALIBRATE_STATE:
       break;
@@ -149,7 +153,7 @@ int check_MainMenu() {
     return BTN_NE;
   }
   // Third button check: 'Save'
-  if ((x >=  20 && x <= 140) && (y >= 140 && y <= 260)) {
+  if ((x >=  20 && x <= 140) && (y >= 140 && y <= 220)) {
     return BTN_SW;
   }
   return BTN_NONE;
@@ -157,17 +161,17 @@ int check_MainMenu() {
 }
 
 void draw_WarmUpScreen() {
+  tft->setTextSize(3);
   // Blank screen
   tft->fillScreen(ILI9341_BLACK);
-  // Draw box
-  tft->fillRect( 20, 20, 120, 80, ILI9341_YELLOW);
   // Draw text
-  tft->setCursor( 40, 50);
-  tft->setTextColor( ILI9341_BLACK, ILI9341_YELLOW);
+  tft->setCursor( 60, 100);
+  tft->setTextColor( ILI9341_WHITE, ILI9341_BLACK);
   tft->println("Warming up");
 }
 
 void draw_ReadScreen() {
+  tft->setTextSize(2);
   // Blank the screen
   tft->fillScreen(ILI9341_BLACK);
   // Draw boxes
@@ -196,14 +200,56 @@ void draw_MenuScreen() {
   tft->fillRect( 20,190,280, 40, ILI9341_MAGENTA);
   tft->setTextSize(2);
   // Write text on button 1
-  tft->setCursor( 55, 52);
+  tft->setCursor( 55, 46);
   tft->setTextColor( ILI9341_BLACK, ILI9341_RED );
   tft->println("Back");
+  // Write text on button 2
+  tft->setCursor(205, 46);
+  tft->setTextColor( ILI9341_BLACK, ILI9341_YELLOW );
+  tft->println("ShutDn");
   // Celsius or Fahrenheit
-  // Shutdown
+  tft->setTextColor( ILI9341_BLACK, ILI9341_MAGENTA );
+  tft->setCursor( 50,105);
+  tft->println("Celsius/Fahrenheit");
   // Calibrate
+  tft->setCursor( 50,155);
+  tft->println("Calibrate");
   // Logs
+  tft->setCursor( 50,205);
+  tft->println("View Logs");
 }
 
+int check_MenuScreen() {
+  uint16_t x, y;
+  uint8_t z;
+  if (ts->bufferEmpty()) {
+    return BTN_NONE;
+  }
+  ts->readData(&x, &y, &z);
+  
+  
+  // Scale the coordinates
+  x = map(x, TS_MINX, TS_MAXX, 0, tft->width());
+  y = map(y, TS_MINY, TS_MAXY, 0, tft->height());
+  
+  // First button check: 'Back'
+  if ((x >=  20 && x <= 140) && (y >=  20 && y <=  80)) {
+    return BTN_TOPLEFT;
+  }
+  if ((x >= 180 && x <= 300) && (y >=  20 && y <=  80)) {
+    return BTN_TOPRIGHT;
+  }
+  if ((x >=  20 && x <= 300) && (y >=  90 && y <= 130)) {
+    return BTN_LIST_1;
+  }
+  if ((x >=  20 && x <= 300) && (y >= 140 && y <= 180)) {
+    return BTN_LIST_2;
+  }
+  if ((x >=  20 && x <= 300) && (y >= 190 && y <= 230)) {
+    return BTN_LIST_3;
+  }
+  
+  return BTN_NONE;
+   
+}
 
-\
