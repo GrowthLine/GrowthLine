@@ -32,7 +32,6 @@ void setup() {
   
   tft = new Adafruit_ILI9341(TFT_CS, TFT_DC);
   ts = new Adafruit_STMPE610(STMPE_CS);
-  p = new TS_Point();
 
 
   /* Setup the sensors */
