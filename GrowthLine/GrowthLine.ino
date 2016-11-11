@@ -17,7 +17,6 @@ Sensor *sensors[totalSensors];
 LightSensor lux(&reading);
 Adafruit_STMPE610 *ts;
 Adafruit_ILI9341 *tft;
-TS_Point *p;
 
 void setup() {
   Serial.begin(9600);
