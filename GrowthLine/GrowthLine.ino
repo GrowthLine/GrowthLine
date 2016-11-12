@@ -197,8 +197,26 @@ void draw_ReadScreen() {
   tft->setTextColor( ILI9341_BLACK, ILI9341_RED);
   tft->println("Stop");
   // Draw reading 1
+  /*
+  tft->setCursor( XPOS, YPOS);
+  tft->println("pH");
+  tft->setCursor( XPOS, YPOS);
+  tft->println( PH_READING);
+  */
   // Draw reading 2
+  /*
+  tft->setCursor( XPOS, YPOS);
+  tft->println("Moisture");
+  tft->setCursor( XPOS, YPOS);
+  tft->println(MOIST_READ);
+  */
   // Draw reading 3
+  /*
+  tft->setCursor( XPOS, YPOS);
+  tft->println("Temp.");
+  tft->setCursor( XPOS, YPOS);
+  tft->println(TEMP_READ);
+  */
 }
 
 void draw_MenuScreen() {
