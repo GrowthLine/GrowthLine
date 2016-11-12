@@ -91,6 +91,10 @@ void loop() {
       }
       break;
     case SAVE_STATE:
+      if (redraw) {
+        draw_SaveScreen();
+        redraw = false;
+      }
       break;
     case MENU_STATE:
       if (redraw) {
@@ -168,6 +172,16 @@ void draw_WarmUpScreen() {
   tft->println("Warming up");
 }
 
+void draw_SaveScreen() {
+  tft->setTextSize(3);
+  // Blank screen
+  tft->fillScreen(ILI9341_BLACK);
+  // Draw text
+  tft->setCursor( 62, 100);
+  tft->setTextColor( ILI9341_WHITE, ILI9341_BLACK);
+  tft->println("Saving");
+}
+
 void draw_ReadScreen() {
   tft->setTextSize(2);
   // Blank the screen
@@ -217,6 +231,7 @@ void draw_MenuScreen() {
   tft->println("View Logs");
 }
 
+/*
 int check_MenuScreen() {
   uint16_t x, y;
   uint8_t z;
@@ -250,4 +265,4 @@ int check_MenuScreen() {
   return BTN_NONE;
    
 }
-
+*/
