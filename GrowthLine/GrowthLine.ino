@@ -105,6 +105,10 @@ void loop() {
     case CALIBRATE_STATE:
       break;
     case SHUTDOWN_STATE:
+      if (redraw) {
+        draw_ShutdownScreen();
+        redraw = false;
+      }
       break;
     default:
       break;
@@ -180,6 +184,16 @@ void draw_SaveScreen() {
   tft->setCursor( 62, 100);
   tft->setTextColor( ILI9341_WHITE, ILI9341_BLACK);
   tft->println("Saving");
+}
+
+void draw_ShutdownScreen() {
+  tft->setTextSize(3);
+  // Blank screen
+  tft->fillScreen(ILI9341_BLACK);
+  // Draw text
+  tft->setCursor( 60, 100);
+  tft->setTextColor( ILI9341_WHITE, ILI9341_BLACK);
+  tft->println("Shutting Down");
 }
 
 void draw_ReadScreen() {
