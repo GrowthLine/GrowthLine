@@ -213,19 +213,37 @@ void draw_ReadScreen() {
   // Draw reading 1
   /*
   tft->setCursor(200, YPOS);
-  tft->print("pH      :");
-  tft->println(readings.peek()->pH);
+  tft->print("Amb. Lite:");
+  tft->println(readings.peek()->lux);
   */
   // Draw reading 2
   /*
   tft->setCursor(200, YPOS);
-  tft->print("Moisture:");
-  tft->println(readings.peek()->moisture);
+  tft->print("Air Temp.:");
+  tft->println(readings.peek()->airTemperature);
   */
   // Draw reading 3
   /*
   tft->setCursor(200, YPOS);
-  tft->print("Temp   :");
+  tft->print("Humidity :");
+  tft->println(readings.peek()->humidity);
+  */
+  // Draw reading 4
+  /*
+  tft->setCursor(200, YPOS);
+  tft->print("pH       :");
+  tft->println(readings.peek()->pH);
+  */
+  // Draw reading 5
+  /*
+  tft->setCursor(200, YPOS);
+  tft->print("Moisture :");
+  tft->println(readings.peek()->moisture);
+  */
+  // Draw reading 6
+  /*
+  tft->setCursor(200, YPOS);
+  tft->print("Temp    :");
   tft->println(readings.peek()->groundTemperature);
   */
 }
