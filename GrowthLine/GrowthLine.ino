@@ -201,10 +201,10 @@ void draw_ReadScreen() {
   // Blank the screen
   tft->fillScreen(ILI9341_BLACK);
   // Draw boxes
-  tft->fillRect( 20, 20, 120, 80, ILI9341_RED);
-  tft->fillRect(160, 20,140,100, ILI9341_YELLOW);
-  tft->fillRect( 20,120,140,100, ILI9341_GREEN);
-  tft->fillRect(160,120,140,100, ILI9341_BLUE);
+  tft->fillRect( 20, 20, 200, 80, ILI9341_RED);
+  //tft->fillRect(160, 20,140,100, ILI9341_YELLOW);
+  //tft->fillRect( 20,120,140,100, ILI9341_GREEN);
+  //tft->fillRect(160,120,140,100, ILI9341_BLUE);
   tft->setTextSize(2);
   // Draw text
   tft->setCursor( 55, 52);
@@ -212,23 +212,20 @@ void draw_ReadScreen() {
   tft->println("Stop");
   // Draw reading 1
   /*
-  tft->setCursor( XPOS, YPOS);
-  tft->println("pH");
-  tft->setCursor( XPOS, YPOS);
+  tft->setCursor(200, YPOS);
+  tft->print("pH      :");
   tft->println(readings.peek()->pH);
   */
   // Draw reading 2
   /*
-  tft->setCursor( XPOS, YPOS);
-  tft->println("Moisture");
-  tft->setCursor( XPOS, YPOS);
+  tft->setCursor(200, YPOS);
+  tft->print("Moisture:");
   tft->println(readings.peek()->moisture);
   */
   // Draw reading 3
   /*
-  tft->setCursor( XPOS, YPOS);
-  tft->println("Temp.");
-  tft->setCursor( XPOS, YPOS);
+  tft->setCursor(200, YPOS);
+  tft->print("Temp   :");
   tft->println(readings.peek()->groundTemperature);
   */
 }
