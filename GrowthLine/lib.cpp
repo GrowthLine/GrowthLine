@@ -14,6 +14,12 @@ Reading::Reading() {
   Reading( 0, 0, 0, 0, 0, 0);
 }
 
+String Reading::toString() {
+  String line = "";
+  line = line + groundTemperature + "," + moisture + "," + pH + "," + airTemperature + "," + humidity + "," + lux;
+  return line;
+}
+
 /* ~~~~~~~~~~~~~~~~~~~~~~~ Sensor Abstract Class ~~~~~~~~~~~~~~~~~~~~~~~ */
 
 Sensor::~Sensor() {}                                                        // Needed to destruct the Sensor objects

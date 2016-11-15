@@ -52,6 +52,7 @@ class Reading {
 
     Reading( float, float, float, float, float, float );
     Reading();
+    String toString();
 };
 
 /* Abstract class, all sensors inherit from this */
