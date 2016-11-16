@@ -156,10 +156,35 @@ void draw_ShutdownScreen() {
   tft->setTextColor( ILI9341_WHITE, ILI9341_BLACK);
   tft->println("Shutting Down");
 }
+
+void draw_ReadScreen() {
+  // Blank the screen
+  tft->fillScreen(ILI9341_BLACK);
+  
+  // Draw boxes
+  tft->fillRect( 20, 20, 120, 80, ILI9341_RED);
+  tft->fillRect(170, 20, 120, 80, ILI9341_GREEN);
+  
+  // Draw text for 'Stop' button
+  tft->setTextSize(3);
+  tft->setCursor( 45, 52);
+  tft->setTextColor( ILI9341_BLACK, ILI9341_RED);
+  tft->println("Stop");
+  
+  //Draw text for 'Save' button
+  tft->setCursor(195, 52);
+  tft->setTextColor( ILI9341_BLACK, ILI9341_GREEN);
+  tft->println("Save");
+}
+
 void update_Readings() {
-  tft->fillRect(  0, 101, 320, 240, ILI9341_BLACK);
+  // Blank out numbers
+  tft->fillRect(140,101, 180,139, ILI9341_BLACK);
+  
+  // Set text parameters
   tft->setTextSize(2);
   tft->setTextColor( ILI9341_WHITE, ILI9341_BLACK);
+  
   // Draw reading 1
   String amb_lite    = "Amb. Lite: ";
   tft->setCursor( 20, 112);
@@ -189,24 +214,6 @@ void update_Readings() {
   String ground_temp = "Gnd. Temp: ";
   tft->setCursor( 20, 212);
   tft->println(ground_temp + readings.peek()->groundTemperature);
-}
-
-void draw_ReadScreen() {
-
-  // Blank the screen
-  tft->fillScreen(ILI9341_BLACK);
-  // Draw boxes
-  tft->fillRect( 20, 20, 120, 80, ILI9341_RED);
-  tft->fillRect(170, 20, 120, 80, ILI9341_GREEN);
-  // Draw text
-  tft->setTextSize(3);
-  tft->setCursor( 45, 52);
-  tft->setTextColor( ILI9341_BLACK, ILI9341_RED);
-  tft->println("Stop");
-
-  tft->setCursor(195, 52);
-  tft->setTextColor( ILI9341_BLACK, ILI9341_GREEN);
-  tft->println("Save");
 }
 
 void draw_CalibrateScreen() {
