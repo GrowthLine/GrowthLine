@@ -260,9 +260,10 @@ void draw_MenuScreen() {
   // Write text on button 2
   tft->setCursor(205, 52);
   tft->println("C/F");
-  // Write text on button 3
-  tft->setCursor( 55, 172);
-  tft->println("Logs");
+  // Write text on button 3 
+  // Log functionality not yet implemented.
+  //tft->setCursor( 55, 172);
+  //tft->println("Logs");
   // Write text on button 4
   tft->setCursor(200, 172);
   tft->println("Calibrate");
