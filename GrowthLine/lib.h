@@ -17,6 +17,30 @@
 #define PH_SENSOR_ID 2
 #define TEMP_MOIST_SENSOR_ID 3
 
+// For the touch controller
+#define STMPE_CS 8
+// For the TFT screen
+#define TFT_DC 9
+#define TFT_CS 10
+
+// Touch screen min/max co-ordinates
+#define TS_MINX 150
+#define TS_MINY 130
+#define TS_MAXX 3800
+#define TS_MAXY 4000
+
+// Button constants
+#define BTN_NONE 0
+#define BTN_NW   1
+#define BTN_NE   2
+#define BTN_SW   3
+#define BTN_SE   4
+#define BTN_TOPLEFT   1
+#define BTN_TOPRIGHT  2
+#define BTN_LIST_1    3
+#define BTN_LIST_2    4
+#define BTN_LIST_3    5
+
 /* Library needed for the Queue List */
 #include <QueueList.h>
 
@@ -25,6 +49,7 @@
 #include <gfxfont.h>
 #include <Adafruit_STMPE610.h>
 #include <Adafruit_ILI9341.h>
+#include <SPI.h>
 
 /* Libraries needed for Light Sensor  */
 #include <Adafruit_Sensor.h>
