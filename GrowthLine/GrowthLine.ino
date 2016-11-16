@@ -73,9 +73,8 @@ void loop() {
       if (redraw) {
         draw_ReadScreen();
         redraw = false;
-      } else {
-        update_Readings();
       }
+      update_Readings();
       break;
     case SAVE_STATE:
       if (redraw) {
@@ -163,33 +162,33 @@ void update_Readings() {
   tft->setTextColor( ILI9341_WHITE, ILI9341_BLACK);
   // Draw reading 1
   tft->setCursor( 20, 112);
-  tft->println("Amb. Lite: ");
-  //tft->println("Amb. Lite: " + readings.peek()->lux);
+  //tft->println("Amb. Lite: ");
+  tft->println("Amb. Lite: " + readings.peek()->lux);
 
   // Draw reading 2
   tft->setCursor( 20, 132);
-  tft->println("Air Temp.: ");
-  //tft->println("Air Temp.: " + readings.peek()->airTemperature);
+  //tft->println("Air Temp.: ");
+  tft->println("Air Temp.: " + readings.peek()->airTemperature);
 
   // Draw reading 3
   tft->setCursor( 20, 152);
-  tft->println("Humidity : ");
-  //tft->println("Humidity : " + readings.peek()->humidity);
+  //tft->println("Humidity : ");
+  tft->println("Humidity : " + readings.peek()->humidity);
 
   // Draw reading 4
   tft->setCursor( 20, 172);
-  tft->println("pH       : ");
-  //tft->println("pH       : " + readings.peek()->pH);
+  //tft->println("pH       : ");
+  tft->println("pH       : " + readings.peek()->pH);
 
   // Draw reading 5
   tft->setCursor( 20, 192);
-  tft->println("Moisture : ");
-  //tft->println("Moisture : " + readings.peek()->moisture);
+  //tft->println("Moisture : ");
+  tft->println("Moisture : " + readings.peek()->moisture);
 
   // Draw reading 6
   tft->setCursor( 20, 212);
-  tft->println("Gnd. Temp: ");
-  //tft->println("Gnd. Temp: " + readings.peek()->groundTemperature);
+  //tft->println("Gnd. Temp: ");
+  tft->println("Gnd. Temp: " + readings.peek()->groundTemperature);
 }
 
 void draw_ReadScreen() {
@@ -208,7 +207,7 @@ void draw_ReadScreen() {
   tft->setCursor(195, 52);
   tft->setTextColor( ILI9341_BLACK, ILI9341_GREEN);
   tft->println("Save");
-
+/*
   tft->setTextSize(2);
   tft->setTextColor( ILI9341_WHITE, ILI9341_BLACK);
   // Draw reading 1
@@ -240,6 +239,7 @@ void draw_ReadScreen() {
   tft->setCursor( 20, 212);
   //tft->print("Gnd. Temp: ");
   tft->println(readings.peek()->groundTemperature);
+  */
 }
 
 void draw_CalibrateScreen() {
