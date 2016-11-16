@@ -33,37 +33,15 @@ void setup() {
 }
 
 void loop() {
-  // Screen Stuff Test. Will be removed and replaced by Andrew's Code
-  uint16_t x, y;
-  uint8_t z;
-  if ( touch.touched()) {
-    while (! touch.bufferEmpty() ) {
-      Serial.print(touch.bufferSize());
-      touch.readData(&x, &y, &z);
-      Serial.print("->(");
-      Serial.print(x); Serial.print(", ");
-      Serial.print(y); Serial.print(", ");
-      Serial.print(z);
-      Serial.println(")\n\n");
-    }
-    touch.writeRegister8(STMPE_INT_STA, 0xFF);
-  }
   switch (deviceState) {
     case READY_STATE:
-      if (readings.count() > NUMBER_OF_READINGS)
-        readings.pop();
-      readings.push( sensors.getReading() );
-      Serial.print("The lux is: "); Serial.println(readings.peek()->lux);
-      Serial.print("The air temperature is: "); Serial.println(readings.peek()->airTemperature);
-      Serial.print("The humidity is: "); Serial.println(readings.peek()->humidity);
-      Serial.print("The pH is: "); Serial.println(readings.peek()->pH);
-      Serial.print("The ground temperature is: "); Serial.println(readings.peek()->groundTemperature);
-      Serial.print("The moisture is: "); Serial.println(readings.peek()->moisture);
-      Serial.println("\n\n");
       break;
     case WARMUP_STATE:
       break;
     case READ_STATE:
+      if (readings.count() > NUMBER_OF_READINGS)
+        readings.pop();
+      readings.push( sensors.getReading() );
       break;
     case SAVE_STATE:
       break;
@@ -92,7 +70,13 @@ void loop() {
 //  fillRect( 20, 20, 120, 80, ILI9341_YELLOW);
 //}
 
-
+//      Serial.print("The lux is: "); Serial.println(readings.peek()->lux);
+//      Serial.print("The air temperature is: "); Serial.println(readings.peek()->airTemperature);
+//      Serial.print("The humidity is: "); Serial.println(readings.peek()->humidity);
+//      Serial.print("The pH is: "); Serial.println(readings.peek()->pH);
+//      Serial.print("The ground temperature is: "); Serial.println(readings.peek()->groundTemperature);
+//      Serial.print("The moisture is: "); Serial.println(readings.peek()->moisture);
+//      Serial.println("\n\n");
 
 
 
