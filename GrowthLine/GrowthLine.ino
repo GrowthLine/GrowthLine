@@ -23,13 +23,7 @@ void setup() {
   /* Setup the sensors */
   sensors.setupSensors();
 
-  // Screen Stuff Test. Will be removed and replaced by Andrew's Code
-  pinMode(10, OUTPUT);
-  if (! touch.begin()) {
-    Serial.println("STMPE not found!");
-    while (1);
-  }
-  Serial.println("Setup is complete");
+  /* Screen setup place here */
 }
 
 void loop() {
