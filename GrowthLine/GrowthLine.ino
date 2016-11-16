@@ -50,30 +50,17 @@ void setup() {
   redraw = true;
   Serial.println("Setup is complete");
 }
-
+/**
+ * The if (redraw) prevents the entire screen from 
+ * being redrawn every loop() cycle. This prevents
+ * flickering.
+ */
 void loop() {
   switch (deviceState) {
     case READY_STATE:
       if (redraw) {
         draw_MainMenu();
         redraw = false;
-      }
-      button = check_MainMenu();
-      switch (button) {
-        case BTN_NW:
-          deviceState = WARMUP_STATE;
-          redraw = true;
-          break;
-        case BTN_NE:
-          deviceState = MENU_STATE;
-          redraw = true;
-          break;
-        case BTN_SW:
-          deviceState = SAVE_STATE;
-          redraw = true;
-          break;
-        default:
-          break;
       }
       break;
     case WARMUP_STATE:
@@ -88,6 +75,8 @@ void loop() {
       if (redraw) {
         draw_ReadScreen();
         redraw = false;
+      } else {
+        update_Readings();
       }
       break;
     case SAVE_STATE:
@@ -103,6 +92,10 @@ void loop() {
       }
       break;
     case CALIBRATE_STATE:
+      if (redraw) {
+        draw_CalibrateScreen();
+        redraw = false;
+      }
       break;
     case SHUTDOWN_STATE:
       if (redraw) {
@@ -120,7 +113,6 @@ void draw_MainMenu() {
   // Draw boxes
   tft->fillRect( 20, 20, 120, 80, ILI9341_GREEN );
   tft->fillRect(170, 20, 120, 80, ILI9341_YELLOW);
-  tft->fillRect( 20, 140, 120, 80, ILI9341_ORANGE);
   tft->setTextSize(2);
   // Write text on button 1
   tft->setCursor( 55, 52);
@@ -130,40 +122,12 @@ void draw_MainMenu() {
   tft->setCursor(205, 52);
   tft->setTextColor( ILI9341_BLACK, ILI9341_YELLOW);
   tft->println("Menu");
-  // Write text on button 3
-  tft->setCursor( 55,172);
-  tft->setTextColor( ILI9341_BLACK, ILI9341_ORANGE);
-  tft->println("Save");
-}
 
-int check_MainMenu() {
-  uint16_t x, y;
-  uint8_t z;
-  if (ts->bufferEmpty()) {
-    //Serial.println("No button press.\n");
-    return BTN_NONE;
-  }
-  ts->readData(&x, &y, &z);
-  
-  
-  // Scale the coordinates
-  x = map(x, TS_MINX, TS_MAXX, 0, tft->width());
-  y = map(y, TS_MINY, TS_MAXY, 0, tft->height());
-  
-  // First button check: 'Read'
-  if ((x >=  20 && x <= 140) && (y >=  20 && y <= 100)) {
-    return BTN_NW;
-  }
-  // Second button check: 'Menu'
-  if ((x >= 170 && x <= 290) && (y >=  20 && y <= 100)) {
-    return BTN_NE;
-  }
-  // Third button check: 'Save'
-  if ((x >=  20 && x <= 140) && (y >= 140 && y <= 220)) {
-    return BTN_SW;
-  }
-  return BTN_NONE;
-   
+  /* Draw 'GrowthLine' */
+  tft->setTextSize(4);
+  tft->setTextColor( ILI9341_WHITE, ILI9341_BLACK);
+  tft->setCursor(35,162);
+  tft->println("GrowthLine");
 }
 
 void draw_WarmUpScreen() {
@@ -195,58 +159,118 @@ void draw_ShutdownScreen() {
   tft->setTextColor( ILI9341_WHITE, ILI9341_BLACK);
   tft->println("Shutting Down");
 }
+void update_Readings() {
+  tft->fillRect(  0,101,320,240, ILI9341_BLACK);
+  tft->setTextSize(2);
+  tft->setTextColor( ILI9341_WHITE, ILI9341_BLACK);
+  // Draw reading 1
+  tft->setCursor( 20, 112);
+  tft->println("Amb. Lite: ");
+  //tft->println("Amb. Lite: " + readings.peek()->lux);
+  
+  // Draw reading 2
+  tft->setCursor( 20, 132);
+  tft->println("Air Temp.: ");
+  //tft->println("Air Temp.: " + readings.peek()->airTemperature);
+  
+  // Draw reading 3
+  tft->setCursor( 20, 152);
+  tft->println("Humidity : ");
+  //tft->println("Humidity : " + readings.peek()->humidity);
+  
+  // Draw reading 4
+  tft->setCursor( 20, 172);
+  tft->println("pH       : ");
+  //tft->println("pH       : " + readings.peek()->pH);
+  
+  // Draw reading 5
+  tft->setCursor( 20, 192);
+  tft->println("Moisture : ");
+  //tft->println("Moisture : " + readings.peek()->moisture);
+  
+  // Draw reading 6
+  tft->setCursor( 20, 212);
+  tft->println("Gnd. Temp: ");
+  //tft->println("Gnd. Temp: " + readings.peek()->groundTemperature);
+}
 
 void draw_ReadScreen() {
-  tft->setTextSize(2);
+  
   // Blank the screen
   tft->fillScreen(ILI9341_BLACK);
   // Draw boxes
-  tft->fillRect( 20, 20, 200, 80, ILI9341_RED);
-  //tft->fillRect(160, 20,140,100, ILI9341_YELLOW);
-  //tft->fillRect( 20,120,140,100, ILI9341_GREEN);
-  //tft->fillRect(160,120,140,100, ILI9341_BLUE);
-  tft->setTextSize(2);
+  tft->fillRect( 20, 20, 120, 80, ILI9341_RED);
+  tft->fillRect(170, 20,120, 80, ILI9341_GREEN);
   // Draw text
-  tft->setCursor( 55, 52);
+  tft->setTextSize(3);
+  tft->setCursor( 45, 52);
   tft->setTextColor( ILI9341_BLACK, ILI9341_RED);
   tft->println("Stop");
+
+  tft->setCursor(195, 52);
+  tft->setTextColor( ILI9341_BLACK, ILI9341_GREEN);
+  tft->println("Save");
+  
+  tft->setTextSize(2);
+  tft->setTextColor( ILI9341_WHITE, ILI9341_BLACK);
   // Draw reading 1
-  /*
-  tft->setCursor(200, YPOS);
-  tft->print("Amb. Lite:");
-  tft->println(readings.peek()->lux);
-  */
+  tft->setCursor( 20, 112);
+  tft->print("Amb. Lite: ");
+  //tft->println(readings.peek()->lux);
+  
   // Draw reading 2
-  /*
-  tft->setCursor(200, YPOS);
-  tft->print("Air Temp.:");
-  tft->println(readings.peek()->airTemperature);
-  */
+  tft->setCursor( 20, 132);
+  tft->print("Air Temp.: ");
+  //tft->println(readings.peek()->airTemperature);
+  
   // Draw reading 3
-  /*
-  tft->setCursor(200, YPOS);
-  tft->print("Humidity :");
-  tft->println(readings.peek()->humidity);
-  */
+  tft->setCursor( 20, 152);
+  tft->print("Humidity : ");
+  //tft->println(readings.peek()->humidity);
+  
   // Draw reading 4
-  /*
-  tft->setCursor(200, YPOS);
-  tft->print("pH       :");
-  tft->println(readings.peek()->pH);
-  */
+  tft->setCursor( 20, 172);
+  tft->print("pH       : ");
+  //tft->println(readings.peek()->pH);
+  
   // Draw reading 5
-  /*
-  tft->setCursor(200, YPOS);
-  tft->print("Moisture :");
-  tft->println(readings.peek()->moisture);
-  */
+  tft->setCursor( 20, 192);
+  tft->print("Moisture : ");
+  //tft->println(readings.peek()->moisture);
+  
   // Draw reading 6
-  /*
-  tft->setCursor(200, YPOS);
-  tft->print("Temp    :");
-  tft->println(readings.peek()->groundTemperature);
-  */
+  tft->setCursor( 20, 212);
+  tft->print("Gnd. Temp: ");
+  //tft->println(readings.peek()->groundTemperature);
 }
+
+void draw_CalibrateScreen() {
+  
+  // Blank the screen
+  tft->fillScreen(ILI9341_BLACK);
+  // Draw boxes
+  tft->fillRect( 20, 20, 120, 80, ILI9341_RED);
+  tft->fillRect(170, 20,120, 80, ILI9341_GREEN);
+  // Draw text
+  tft->setTextSize(3);
+  tft->setCursor( 45, 52);
+  tft->setTextColor( ILI9341_BLACK, ILI9341_RED);
+  tft->println("Back");
+
+  tft->setCursor(200, 52);
+  tft->setTextColor( ILI9341_BLACK, ILI9341_GREEN);
+  tft->println("Go");
+
+  // Draw Instructions
+  tft->setTextSize(2);
+  tft->setTextColor( ILI9341_WHITE, ILI9341_BLACK);
+  tft->setCursor( 20, 132); tft->print("Dip the pH probe into a");
+  tft->setCursor( 20, 152); tft->print("  7 pH solution, then"  );
+  tft->setCursor( 20, 172); tft->print("      press Go."        );
+  
+  tft->setCursor( 20, 212); tft->print(" Press back to cancel." );
+}
+
 
 void draw_MenuScreen() {
   tft->fillScreen(ILI9341_BLACK);
