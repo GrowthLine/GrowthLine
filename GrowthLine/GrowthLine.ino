@@ -161,34 +161,34 @@ void update_Readings() {
   tft->setTextSize(2);
   tft->setTextColor( ILI9341_WHITE, ILI9341_BLACK);
   // Draw reading 1
+  String amb_lite    = "Amb. Lite: ";
   tft->setCursor( 20, 112);
-  //tft->println("Amb. Lite: ");
-  tft->println("Amb. Lite: " + readings.peek()->lux);
+  tft->println(amb_lite + readings.peek()->lux);
 
   // Draw reading 2
+  String air_temp    = "Air Temp.: ";
   tft->setCursor( 20, 132);
-  //tft->println("Air Temp.: ");
-  tft->println("Air Temp.: " + readings.peek()->airTemperature);
+  tft->println(air_temp + readings.peek()->airTemperature);
 
   // Draw reading 3
+  String humidity    = "Humidity : ";
   tft->setCursor( 20, 152);
-  //tft->println("Humidity : ");
-  tft->println("Humidity : " + readings.peek()->humidity);
+  tft->println(humidity + readings.peek()->humidity);
 
   // Draw reading 4
+  String ph          = "pH       : ";
   tft->setCursor( 20, 172);
-  //tft->println("pH       : ");
-  tft->println("pH       : " + readings.peek()->pH);
+  tft->println(ph + readings.peek()->pH);
 
   // Draw reading 5
+  String moisture    = "Moisture : ";
   tft->setCursor( 20, 192);
-  //tft->println("Moisture : ");
-  tft->println("Moisture : " + readings.peek()->moisture);
+  tft->println(moisture + readings.peek()->moisture);
 
   // Draw reading 6
+  String ground_temp = "Gnd. Temp: ";
   tft->setCursor( 20, 212);
-  //tft->println("Gnd. Temp: ");
-  tft->println("Gnd. Temp: " + readings.peek()->groundTemperature);
+  tft->println(ground_temp + readings.peek()->groundTemperature);
 }
 
 void draw_ReadScreen() {
