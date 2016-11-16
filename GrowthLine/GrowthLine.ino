@@ -207,39 +207,6 @@ void draw_ReadScreen() {
   tft->setCursor(195, 52);
   tft->setTextColor( ILI9341_BLACK, ILI9341_GREEN);
   tft->println("Save");
-/*
-  tft->setTextSize(2);
-  tft->setTextColor( ILI9341_WHITE, ILI9341_BLACK);
-  // Draw reading 1
-  tft->setCursor( 20, 112);
-  tft->print("Amb. Lite: ");
-  //tft->println(readings.peek()->lux);
-
-  // Draw reading 2
-  tft->setCursor( 20, 132);
-  //tft->print("Air Temp.: ");
-  tft->println(readings.peek()->airTemperature);
-
-  // Draw reading 3
-  tft->setCursor( 20, 152);
-  //tft->print("Humidity : ");
-  tft->println(readings.peek()->humidity);
-
-  // Draw reading 4
-  tft->setCursor( 20, 172);
-  //tft->print("pH       : ");
-  tft->println(readings.peek()->pH);
-
-  // Draw reading 5
-  tft->setCursor( 20, 192);
-  //tft->print("Moisture : ");
-  tft->println(readings.peek()->moisture);
-
-  // Draw reading 6
-  tft->setCursor( 20, 212);
-  //tft->print("Gnd. Temp: ");
-  tft->println(readings.peek()->groundTemperature);
-  */
 }
 
 void draw_CalibrateScreen() {
