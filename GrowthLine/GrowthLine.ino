@@ -397,7 +397,7 @@ void draw_ShutdownScreen() {
   tft->println("Shutting Down");
 }
 
-void draw_LogScreen() {
+void draw_LogScreen(String[] in_array) {
   // Blank the screen
   tft->fillScreen(ILI9341_BLACK);
 
@@ -416,25 +416,10 @@ void draw_LogScreen() {
   tft->setTextColor( ILI9341_BLACK, ILI9341_GREEN);
   tft->println("Next");
   
-  // Output lines
-  
-  // Line 1
-  tft->setCursor( 20, 112);
-  tft->println("#1");
-  
-  tft->setCursor( 20, 132);
-  tft->println("#2");
-  
-  tft->setCursor( 20, 152);
-  tft->println("#3");
-  
-  tft->setCursor( 20, 182);
-  tft->println("#4");
-  
-  tft->setCursor( 20, 212);
-  tft->println("#5");
-  
-  tft->setCursor( 20, 232);
-  tft->println("#6");
+  // Output lines  
+  for (int i = 0; i < 6; i++) {
+    tft->setCursor( 20, 82 + (i * 30));
+    tft->println(inarray[i]);
+  }
 }
 
