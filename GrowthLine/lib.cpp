@@ -175,6 +175,8 @@ Sensor* Sensors::getSensor(uint8_t id) {
       sensors.push(sensor);
       return sensor;
     }
+    else
+      sensors.push(sensor);
   }
 }
 

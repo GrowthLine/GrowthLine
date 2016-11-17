@@ -1,3 +1,4 @@
+// Different device states
 #define READY_STATE 0
 #define WARMUP_STATE 1
 #define READ_STATE 2
@@ -6,12 +7,14 @@
 #define CALIBRATE_STATE 5
 #define SHUTDOWN_STATE 6
 
+// PINs for the sensors
 #define PH_RECEIVE_PIN 2
 #define PH_TRANSMIT_PIN 3
 #define TEMP_HUMID_PIN 5
 #define TEMP_MOIST_DATA_PIN 6
 #define TEMP_MOIST_CLOCK_PIN 7
 
+// IDs given to the different sensors
 #define LUX_SENSOR_ID 0
 #define TEMP_HUMID_SENSOR_ID 1
 #define PH_SENSOR_ID 2
@@ -19,6 +22,7 @@
 
 // For the touch controller
 #define STMPE_CS 8
+
 // For the TFT screen
 #define TFT_DC 9
 #define TFT_CS 10
@@ -31,8 +35,8 @@
 
 // Button constants
 #define BTN_NONE 0
-#define BTN_NW   1
-#define BTN_NE   2
+#define BTN_NE   1
+#define BTN_NW   2
 #define BTN_SW   3
 #define BTN_SE   4
 
