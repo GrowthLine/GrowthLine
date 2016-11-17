@@ -9,6 +9,7 @@ const int WARMUP_LENGTH = 5000;                 // length of the warm up in mill
 QueueList<Reading*> readings;                   // List used to hold reading objects. Structured in a queue.
 Sensors sensors;                                // Object that will hold and manage all other sensors
 int deviceState;                                // State of device
+bool fahrenheit;                                // Saves user information about temperature unit
 bool redraw;                                    // Flag used to know when to redraw a screen
 unsigned long milliseconds;                     // saves milliseconds. Used with millis() to check lenths of time
 Adafruit_STMPE610 *ts;                          // pointer to a touch screen object
@@ -19,6 +20,7 @@ void setup() {
   readings.setPrinter(Serial);
   deviceState   = READY_STATE;
   redraw        = true;
+  fahrenheit    = false;
 
   /* Add the sensors to our Sensors object */
   sensors.addSensor(new LightSensor());
@@ -60,22 +62,18 @@ void loop() {
       touchedQuadrant = getQuadrantFromPoint(&touchedPoint);
   }
 
-  // for debugging purposes
-  if (touchedQuadrant != 0)
-    Serial.println(touchedQuadrant);
-
   // State Machine of the device
   switch (deviceState) {
     case READY_STATE:
-      if (redraw) {                             // Draws the main menu
+      if (redraw) {                                     
         draw_MainMenu();
         redraw = false;
       }
-      if ( touchedQuadrant == BTN_NW ) {        // if Read button is pressed, go to Warm-up State
+      if ( touchedQuadrant == BTN_NW ) {                // if Read button is pressed, go to Warm-up State
         deviceState = WARMUP_STATE;
         redraw = true;
       }
-      else if ( touchedQuadrant == BTN_NE) {    // if Menu button is pressed, go to the meny screen
+      else if ( touchedQuadrant == BTN_NE) {            // if Menu button is pressed, go to the meny screen
         deviceState = MENU_STATE;
         redraw = true;
       }
@@ -100,7 +98,7 @@ void loop() {
         deviceState = READY_STATE;
         redraw = true;
       }
-      else if ( touchedQuadrant == BTN_NE ) {
+      else if ( touchedQuadrant == BTN_NE ) {            // if save button is pressed, save and go back to main menu
         deviceState = SAVE_STATE;
         redraw = true;
       }
@@ -127,19 +125,22 @@ void loop() {
         redraw = false;
       }
 
-      if(touchedQuadrant == BTN_NW) {
+      if(touchedQuadrant == BTN_NW) {                       // if back button is pressed, go back to main screen
         deviceState = READY_STATE;
         redraw = true;
       }
-      else if(touchedQuadrant == BTN_NE) {
-        /**** Code to change to Celcious/Fereinheit option here ****/
+      else if(touchedQuadrant == BTN_NE) {                  // if C/F button is pressed, change temperature unit
+        if( fahrenheit )
+          fahrenheit = false;
+        else
+          fahrenheit = true;
         redraw = true;
       }
-      else if(touchedQuadrant == BTN_SW) {
+      else if(touchedQuadrant == BTN_SW) {                  // if view log button is pressed, show the logs
         /***** Code for logs screen here *****/
         redraw = true;
       }
-      else if(touchedQuadrant == BTN_SE) {
+      else if(touchedQuadrant == BTN_SE) {                  // if calibrate button is pressed, go to calibration state
         deviceState = CALIBRATE_STATE;
         redraw = true;
       }
@@ -149,11 +150,11 @@ void loop() {
         draw_CalibrateScreen();
         redraw = false;
       }
-      if (touchedQuadrant == BTN_NW) {
+      if (touchedQuadrant == BTN_NW) {                      // if stop button is pressed, do not save and go back to menu
         deviceState = MENU_STATE;
         redraw = true;
       }
-      else if( touchedQuadrant == BTN_NE){
+      else if( touchedQuadrant == BTN_NE){                  // if go button is pressed, calibrate pH sensor
         pH *phSensor = (pH*)sensors.getSensor(PH_SENSOR_ID);
         phSensor->calibrate();
       }
@@ -180,6 +181,10 @@ uint8_t getQuadrantFromPoint(TS_Point *p) {
     return BTN_NE;
   else
     return BTN_NONE;
+}
+
+float cToF(float c) {
+  return c * 1.8 + 32;
 }
 
 void draw_MainMenu() {
@@ -269,7 +274,10 @@ void update_Readings() {
   // Draw reading 2
   String air_temp    = "Air Temp.: ";
   tft->setCursor( 20, 132);
-  tft->println(air_temp + readings.peek()->airTemperature);
+  if( fahrenheit)
+    tft->println(air_temp + cToF(readings.peek()->airTemperature));
+  else
+    tft->println(air_temp + readings.peek()->airTemperature);
 
   // Draw reading 3
   String humidity    = "Humidity : ";
@@ -289,7 +297,10 @@ void update_Readings() {
   // Draw reading 6
   String ground_temp = "Gnd. Temp: ";
   tft->setCursor( 20, 212);
-  tft->println(ground_temp + readings.peek()->groundTemperature);
+  if( fahrenheit)
+    tft->println(air_temp + cToF(readings.peek()->groundTemperature));
+  else
+    tft->println(air_temp + readings.peek()->groundTemperature);
 }
 
 void draw_CalibrateScreen() {
@@ -330,11 +341,22 @@ void draw_MenuScreen() {
   tft->setCursor( 55, 52);
   tft->setTextColor( ILI9341_BLACK, ILI9341_YELLOW );
   tft->println("Back");
-  // Set text color for following buttons
-  tft->setTextColor( ILI9341_BLACK, ILI9341_MAGENTA);
   // Write text on button 2
   tft->setCursor(205, 52);
-  tft->println("C/F");
+  if(fahrenheit) {
+    tft->setTextColor( ILI9341_MAGENTA, ILI9341_MAGENTA);
+    tft->print("C");
+    tft->setTextColor( ILI9341_BLACK, ILI9341_MAGENTA);
+    tft->print("/F");
+  }
+  else {
+    tft->setTextColor( ILI9341_BLACK, ILI9341_MAGENTA);
+    tft->print("C/");
+    tft->setTextColor( ILI9341_MAGENTA, ILI9341_MAGENTA);
+    tft->print("F");
+  }
+  // Set text color for following buttons
+  tft->setTextColor( ILI9341_BLACK, ILI9341_MAGENTA);
   // Write text on button 3
   // Log functionality not yet implemented.
   //tft->setCursor( 55, 172);
