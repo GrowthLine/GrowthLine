@@ -299,12 +299,12 @@ void draw_MenuScreen() {
   // Draw boxes
   tft->fillRect( 20, 20, 120, 80, ILI9341_YELLOW );
   tft->fillRect(180, 20, 120, 80, ILI9341_MAGENTA);
-  tft->fillRect( 20, 140, 120, 80, ILI9341_MAGENTA);
-  tft->fillRect(180, 140, 120, 80, ILI9341_MAGENTA);
+  tft->fillRect( 20,140, 120, 80, ILI9341_MAGENTA);
+  tft->fillRect(180,140, 120, 80, ILI9341_MAGENTA);
   tft->setTextSize(2);
   // Write text on button 1
   tft->setCursor( 55, 52);
-  tft->setTextColor( ILI9341_BLACK, ILI9341_GREEN  );
+  tft->setTextColor( ILI9341_BLACK, ILI9341_YELLOW );
   tft->println("Back");
   // Set text color for following buttons
   tft->setTextColor( ILI9341_BLACK, ILI9341_MAGENTA);
@@ -316,7 +316,7 @@ void draw_MenuScreen() {
   //tft->setCursor( 55, 172);
   //tft->println("Logs");
   // Write text on button 4
-  tft->setCursor(200, 172);
+  tft->setCursor(190, 172);
   tft->println("Calibrate");
 }
 
