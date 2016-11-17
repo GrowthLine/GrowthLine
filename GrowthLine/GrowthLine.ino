@@ -88,7 +88,7 @@ void loop() {
       milliseconds = millis();
       while(millis() - milliseconds < WARMUP_LENGTH)     // Get readings without saving for several seconds without saving to warm up
         sensors.getReading();
-      deviceState = READ_STATE
+      deviceState = READ_STATE;
       redraw = true;
       break;
     case READ_STATE:
