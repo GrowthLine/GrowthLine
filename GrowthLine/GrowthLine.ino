@@ -121,16 +121,41 @@ void loop() {
       deviceState = READY_STATE;
       redraw = true;
       break;
-    case MENU_STATE:        // ******** Need to do this one ******* ///
+    case MENU_STATE:
       if (redraw) {
         draw_MenuScreen();
         redraw = false;
       }
+
+      if(touchedQuadrant == BTN_NW) {
+        deviceState = READY_STATE;
+        redraw = true;
+      }
+      else if(touchedQuadrant == BTN_NE) {
+        /**** Code to change to Celcious/Fereinheit option here ****/
+        redraw = true;
+      }
+      else if(touchedQuadrant == BTN_SW) {
+        /***** Code for logs screen here *****/
+        redraw = true;
+      }
+      else if(touchedQuadrant == BTN_SE) {
+        deviceState = CALIBRATE_STATE;
+        redraw = true;
+      }
       break;
-    case CALIBRATE_STATE:     // ******** Need to do this one ******* ///
+    case CALIBRATE_STATE:
       if (redraw) {
         draw_CalibrateScreen();
         redraw = false;
+      }
+      if (touchedQuadrant == BTN_NW) {
+        deviceState = MENU_STATE;
+        redraw = true;
+      }
+      else if( touchedQuadrant == BTN_NE){
+        pH *phSensor = (pH*)sensors.getSensor(PH_SENSOR_ID);
+        phSensor->calibrate();
       }
       break;
     case SHUTDOWN_STATE:      // ******** Need to do this one ******* ///
@@ -288,9 +313,8 @@ void draw_CalibrateScreen() {
   tft->setTextSize(2);
   tft->setTextColor( ILI9341_WHITE, ILI9341_BLACK);
   tft->setCursor( 20, 132); tft->print("Dip the pH probe into a");
-  tft->setCursor( 20, 152); tft->print("  7 pH solution, then"  );
-  tft->setCursor( 20, 172); tft->print("      press Go."        );
-
+  tft->setCursor( 20, 152); tft->print("  7 pH solution at 25C."  );
+  tft->setCursor( 20, 172); tft->print("After 2 minutes, press Go.");
   tft->setCursor( 20, 212); tft->print(" Press back to cancel." );
 }
 

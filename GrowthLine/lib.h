@@ -127,7 +127,7 @@ class pH : public Sensor {
     void read();
     void setUp();
     void setReading(Reading *r);
-    void calibrate(uint8_t);
+    void calibrate();
 };
 
 /* Ground Temperature/Moisture Class */

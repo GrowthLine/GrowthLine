@@ -97,17 +97,13 @@ void pH::setUp() {}
 
 void pH::setReading(Reading *r) {
   reading = r;
+
 }
 
-void pH::calibrate(uint8_t points ) {
-  switch (points) {
-    case 1:
-      break;
-    case 2:
-      break;
-    case 3:
-      break;
-  }
+void pH::calibrate() {
+  serial->print("Cal,mid,7.00\r");
+  while( serial->available() > 0)     // Clears the buffer
+    serial->read();
 }
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~ Temperatue / Moisture Class ~~~~~~~~~~~~~~~~~~~~~~~ */  // Not done Yet
