@@ -366,3 +366,54 @@ void draw_MenuScreen() {
   tft->println("Calibrate");
 }
 
+
+void draw_WarmUpScreen() {
+  tft->setTextSize(3);
+  // Blank screen
+  tft->fillScreen(ILI9341_BLACK);
+  // Draw text
+  tft->setCursor( 60, 100);
+  tft->setTextColor( ILI9341_WHITE, ILI9341_BLACK);
+  tft->println("Warming up");
+}
+
+void draw_SaveScreen() {
+  tft->setTextSize(3);
+  // Blank screen
+  tft->fillScreen(ILI9341_BLACK);
+  // Draw text
+  tft->setCursor( 62, 100);
+  tft->setTextColor( ILI9341_WHITE, ILI9341_BLACK);
+  tft->println("Saving");
+}
+
+void draw_ShutdownScreen() {
+  tft->setTextSize(3);
+  // Blank screen
+  tft->fillScreen(ILI9341_BLACK);
+  // Draw text
+  tft->setCursor( 60, 100);
+  tft->setTextColor( ILI9341_WHITE, ILI9341_BLACK);
+  tft->println("Shutting Down");
+}
+
+void draw_LogScreen() {
+  // Blank the screen
+  tft->fillScreen(ILI9341_BLACK);
+
+  // Draw boxes
+  tft->fillRect( 20, 20, 120, 80, ILI9341_RED);
+  tft->fillRect(170, 20, 120, 80, ILI9341_GREEN);
+
+  // Draw text for 'Stop' button
+  tft->setTextSize(3);
+  tft->setCursor( 45, 52);
+  tft->setTextColor( ILI9341_BLACK, ILI9341_RED);
+  tft->println("Back");
+
+  //Draw text for 'Save' button
+  tft->setCursor(195, 52);
+  tft->setTextColor( ILI9341_BLACK, ILI9341_GREEN);
+  tft->println("Next");
+}
+
