@@ -205,7 +205,7 @@ void loop() {
       break;
     case LOG_STATE:
       if (redraw) {
-        draw_LogScreen();
+        
         redraw = false;
       }
       if( touchedQuadrant == BTN_NW) {
@@ -424,11 +424,32 @@ void draw_MenuScreen() {
   tft->println("Calibrate");
 }
 
-void draw_LogScreen() {
-  
+void draw_SettingsScreen() {
 }
 
-void draw_SettingsScreen() {
+void draw_LogScreen(String in_array[]) {
+  // Blank the screen
+  tft->fillScreen(ILI9341_BLACK);
+
+  // Draw boxes
+  tft->fillRect( 20, 20, 120, 80, ILI9341_RED);
+  tft->fillRect(170, 20, 120, 80, ILI9341_GREEN);
+
+  // Draw text for 'Stop' button
+  tft->setTextSize(3);
+  tft->setCursor( 45, 52);
+  tft->setTextColor( ILI9341_BLACK, ILI9341_RED);
+  tft->println("Back");
+
+  //Draw text for 'Save' button
+  tft->setCursor(195, 52);
+  tft->setTextColor( ILI9341_BLACK, ILI9341_GREEN);
+  tft->println("Next");
   
+  // Output lines  
+  for (int i = 0; i < 6; i++) {
+    tft->setCursor( 20, 82 + (i * 30));
+    tft->println(in_array[i]);
+  }
 }
 
