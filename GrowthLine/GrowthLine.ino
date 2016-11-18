@@ -1,9 +1,9 @@
 #include "lib.h"
 
 /* Changable Parameters */
-const unsigned int READING_FREQUENCY = 1000;     // Length in milliseconds before each reading
-const uint8_t NUMBER_OF_READINGS = 5;           // Number of readings we will hold before discarding old one
-const int WARMUP_LENGTH = 5000;                 // length of the warm up in milliseconds
+#define READING_FREQUENCY 1000                  // Length in milliseconds before each reading
+#define NUMBER_OF_READINGS 5                    // Number of readings we will hold before discarding old one
+#define WARMUP_LENGTH 5000                      // length of the warm up in milliseconds
 
 /* Variable Declarations */
 QueueList<Reading*> readings;                   // List used to hold reading objects. Structured in a queue.
@@ -11,7 +11,10 @@ Sensors sensors;                                // Object that will hold and man
 int deviceState;                                // State of device
 bool fahrenheit;                                // Saves user information about temperature unit
 bool redraw;                                    // Flag used to know when to redraw a screen
+bool saveEnable;                                // Used to disable the save button (in case SD card is not inserted)
 unsigned long milliseconds;                     // saves milliseconds. Used with millis() to check lenths of time
+unsigned int readingNumber;                     // holds the current value that will be used to write to SD card
+unsigned int logFileNumber;                     // holds the current log file number
 Adafruit_STMPE610 *ts;                          // pointer to a touch screen object
 Adafruit_ILI9341 *tft;                          // pointer to a display object
 
@@ -21,6 +24,7 @@ void setup() {
   deviceState   = READY_STATE;
   redraw        = true;
   fahrenheit    = false;
+  saveEnable    = true;
 
   /* Add the sensors to our Sensors object */
   sensors.addSensor(new LightSensor());
@@ -35,10 +39,25 @@ void setup() {
   /* Setup the sensors */
   sensors.setupSensors();
 
-  bool started = false;
-  while (!started) {
+  /* Setting up the SD card */
+  File settingsFile;
+  if(! SD.begin(SD_CS_PIN)){
+    Serial.println("SD card initialization failed!");
+    saveEnable = false;
+  }
+  else 
+    settingsFile = SD.open("settings.txt");
+  
+    
+  char tempSetting = ' ';
+  while(settingsFile.available()) {
+    tempSetting = settingsFile.read();
+    
+  }
+  /* check that touch screen is started propperly */
+  while (true) {
     if (ts->begin()) {
-      started = true;
+      break;
     } else {
       Serial.println("Touchscreen controller start failure!");
     }
@@ -48,12 +67,13 @@ void setup() {
   Serial.println("Setup is complete");
 }
 
-/**
+/*
    The if (redraw) prevents the entire screen from
    being redrawn every loop() cycle. This prevents
    flickering.
 */
 void loop() {
+  // Determine if the screen was touched and on which quadrant
   TS_Point touchedPoint;
   uint8_t touchedQuadrant = BTN_NONE;
   while (ts->touched()) {
@@ -98,7 +118,7 @@ void loop() {
         deviceState = READY_STATE;
         redraw = true;
       }
-      else if ( touchedQuadrant == BTN_NE ) {            // if save button is pressed, save and go back to main menu
+      else if ( touchedQuadrant == BTN_NE && saveEnable ) {            // if save button is pressed, save and go back to main menu
         deviceState = SAVE_STATE;
         redraw = true;
       }
@@ -130,18 +150,42 @@ void loop() {
         redraw = true;
       }
       else if(touchedQuadrant == BTN_NE) {                  // if C/F button is pressed, change temperature unit
+        deviceState = SETTINGS_STATE;
+        redraw = true;
+      }
+      else if(touchedQuadrant == BTN_SW) {                  // if view log button is pressed, go to Log state
+        deviceState = LOG_STATE;
+        redraw = true;
+      }
+      else if(touchedQuadrant == BTN_SE) {                  // if calibrate button is pressed, go to calibration state
+        deviceState = SHUTDOWN_STATE;
+        redraw = true;
+      }
+      break;
+    case SETTINGS_STATE:
+      if(redraw) {
+        draw_SettingsScreen();
+        redraw = false;
+      }
+      
+      if (touchedQuadrant == BTN_NW) {
+        deviceState = MENU_STATE;
+        redraw = true;
+      }
+      else if(touchedQuadrant == BTN_NE) {                  // if C/F button is pressed, change temperature unit
         if( fahrenheit )
           fahrenheit = false;
         else
           fahrenheit = true;
         redraw = true;
       }
-      else if(touchedQuadrant == BTN_SW) {                  // if view log button is pressed, show the logs
-        /***** Code for logs screen here *****/
+      else if(touchedQuadrant == BTN_SW) {
+        deviceState = CALIBRATE_STATE;
         redraw = true;
       }
-      else if(touchedQuadrant == BTN_SE) {                  // if calibrate button is pressed, go to calibration state
-        deviceState = CALIBRATE_STATE;
+      else if(touchedQuadrant == BTN_SE) {
+        
+        deviceState = READY_STATE;
         redraw = true;
       }
       break;
@@ -157,6 +201,20 @@ void loop() {
       else if( touchedQuadrant == BTN_NE){                  // if go button is pressed, calibrate pH sensor
         pH *phSensor = (pH*)sensors.getSensor(PH_SENSOR_ID);
         phSensor->calibrate();
+      }
+      break;
+    case LOG_STATE:
+      if (redraw) {
+        draw_LogScreen();
+        redraw = false;
+      }
+      if( touchedQuadrant == BTN_NW) {
+        deviceState = MENU_STATE;
+        redraw = true;
+      }
+      else if ( touchedQuadrant == BTN_NE) {
+        /*** get the next 5 readings here ****/
+        redraw = true;
       }
       break;
     case SHUTDOWN_STATE:      // ******** Need to do this one ******* ///
@@ -364,5 +422,13 @@ void draw_MenuScreen() {
   // Write text on button 4
   tft->setCursor(190, 172);
   tft->println("Calibrate");
+}
+
+void draw_LogScreen() {
+  
+}
+
+void draw_SettingsScreen() {
+  
 }
 

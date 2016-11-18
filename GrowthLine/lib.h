@@ -6,10 +6,13 @@
 #define MENU_STATE 4
 #define CALIBRATE_STATE 5
 #define SHUTDOWN_STATE 6
+#define LOG_STATE 7
+#define SETTINGS_STATE 8
 
 // PINs for the sensors
 #define PH_RECEIVE_PIN 2
 #define PH_TRANSMIT_PIN 3
+#define SD_CS_PIN 4
 #define TEMP_HUMID_PIN 5
 #define TEMP_MOIST_DATA_PIN 6
 #define TEMP_MOIST_CLOCK_PIN 7
@@ -48,15 +51,16 @@
 #include <gfxfont.h>
 #include <Adafruit_STMPE610.h>
 #include <Adafruit_ILI9341.h>
-#include <SPI.h>
+
+/* Libraries needed for SD card */
+#include <SD.h>
 
 /* Libraries needed for Light Sensor  */
 #include <Adafruit_Sensor.h>
 #include <Adafruit_TSL2561_U.h>
-#include <pgmspace.h>
 
 /* Dependencies to the Temp/Humid DHT03 Sensor */
-#include <dht.h>
+#include <DHT_U.h>
 
 /* Librariy for pH circuit */
 #include <SoftwareSerial.h>
@@ -85,7 +89,7 @@ class Sensor {
     Reading *reading;
     uint8_t ID;
     Sensor() {}
-    virtual ~Sensor() = 0;
+    //virtual ~Sensor();
     virtual void read() = 0;
     virtual void setUp() = 0;
     virtual void setReading(Reading *r);
@@ -106,7 +110,7 @@ class LightSensor : public Sensor {
 /* Air Temperature/Humidity Class */
 class TempHumid : public Sensor {
     uint8_t pin;
-    dht DHT;
+    DHT_Unified *DHT;
     uint8_t err;
   public:
     TempHumid(uint8_t);

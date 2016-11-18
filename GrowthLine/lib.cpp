@@ -22,7 +22,7 @@ String Reading::toString() {
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~ Sensor Abstract Class ~~~~~~~~~~~~~~~~~~~~~~~ */
 
-Sensor::~Sensor() {}                                                        // Needed to destruct the Sensor objects
+//Sensor::~Sensor() {}                                                        // Needed to destruct the Sensor objects
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~ Light Sensor Class ~~~~~~~~~~~~~~~~~~~~~~~ */
 LightSensor::LightSensor() {
@@ -50,14 +50,17 @@ void LightSensor::setReading(Reading *r) {
 TempHumid::TempHumid(uint8_t p ) {
   ID = TEMP_HUMID_SENSOR_ID;
   pin = p;
+  DHT = new DHT_Unified(p, DHT22);
 }
 
 TempHumid::~TempHumid() {}                                                    // Needed to destruct the sensor base object
 
 void TempHumid::read() {
-  int sensorStatus = DHT.read22(pin);
-  reading->humidity = DHT.humidity;
-  reading->airTemperature = DHT.temperature;
+  sensors_event_t event;
+  DHT->temperature().getEvent(&event);
+  reading->airTemperature = event.temperature;
+  DHT->humidity().getEvent(&event);
+  reading->humidity = event.relative_humidity;
 }
 
 void TempHumid::setUp() {}
@@ -174,6 +177,7 @@ Sensor* Sensors::getSensor(uint8_t id) {
     else
       sensors.push(sensor);
   }
+  return NULL;
 }
 
 
