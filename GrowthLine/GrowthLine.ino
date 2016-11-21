@@ -18,7 +18,7 @@ unsigned int readingNumber;                     // holds the current value that 
 unsigned int logFileNumber;                     // holds the current log file number
 Adafruit_STMPE610 *ts;                          // pointer to a touch screen object
 Adafruit_ILI9341 *tft;                          // pointer to a display object
-String statusBar;
+String statusBar;                               // holds the message displayed on the status bar
 
 void setup() {
   Serial.begin(9600);
@@ -51,7 +51,6 @@ void setup() {
   }
   else
     settingsFile = SD.open("settings.txt");
-
 
   char tempSetting = ' ';
   while (settingsFile.available()) {
