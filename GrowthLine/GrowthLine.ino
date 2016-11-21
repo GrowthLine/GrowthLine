@@ -18,6 +18,7 @@ unsigned int readingNumber;                     // holds the current value that 
 unsigned int logFileNumber;                     // holds the current log file number
 Adafruit_STMPE610 *ts;                          // pointer to a touch screen object
 Adafruit_ILI9341 *tft;                          // pointer to a display object
+String statusBar;
 
 void setup() {
   Serial.begin(9600);
@@ -27,6 +28,7 @@ void setup() {
   fahrenheit    = false;
   saveEnable    = true;
   tempChange    = true;
+  statusBar     = "GrowthLine";
 
   /* Add the sensors to our Sensors object */
   sensors.addSensor(new LightSensor());
@@ -128,6 +130,7 @@ void loop() {
           case BTN_NW:      // if stop button is pressed, do not save and go back to main menu
             deviceState = READY_STATE;
             redraw = true;
+            statusBar = "GrowthLine";
             break;
         }
         if ( millis() - milliseconds > READING_FREQUENCY) {   // updates displayed reading
@@ -146,6 +149,7 @@ void loop() {
         // ******** Save to SD card code here ******
         deviceState = READY_STATE;
         redraw = true;
+        statusBar = "Log Saved";
         break;
       case MENU_STATE:
         if (redraw) {
@@ -160,6 +164,7 @@ void loop() {
           case BTN_NW:
             deviceState = READY_STATE;
             redraw = true;
+            statusBar = "GrowthLine";
             break;
           case BTN_SW:
             deviceState = LOG_STATE;
@@ -190,7 +195,7 @@ void loop() {
             tempChange = true;
             break;
           case BTN_NW:
-            deviceState = LOG_STATE;
+            deviceState = MENU_STATE;
             redraw = true;
             break;
           case BTN_SW:
@@ -200,6 +205,7 @@ void loop() {
           case BTN_SE:
             deviceState = READY_STATE;
             redraw = true;
+            statusBar = "NewLogFile";
             break;
         }
         break;
@@ -215,6 +221,9 @@ void loop() {
         else if ( touchedQuadrant == BTN_NE) {                // if go button is pressed, calibrate pH sensor
           pH *phSensor = (pH*)sensors.getSensor(PH_SENSOR_ID);
           phSensor->calibrate();
+          deviceState = READY_STATE;
+          redraw = true;
+          statusBar = "Calibrated";
         }
         break;
       case LOG_STATE:
@@ -286,7 +295,7 @@ void draw_MainMenu() {
   tft->setTextSize(4);
   tft->setTextColor( ILI9341_WHITE, ILI9341_BLACK);
   tft->setCursor(35, 162);
-  tft->println("GrowthLine");
+  tft->println(statusBar);
 }
 
 void draw_WarmUpScreen() {
@@ -359,9 +368,9 @@ void update_Readings() {
   String air_temp    = "Air Temp.: ";
   tft->setCursor( 20, 132);
   if (fahrenheit) {
-    tft->println(air_temp + cToF(readings.peek().airTemperature));
+    tft->println(air_temp + cToF(readings.peek().airTemperature) + "F");
   } else {
-    tft->println(air_temp + readings.peek().airTemperature);
+    tft->println(air_temp + readings.peek().airTemperature + "C");
   }
 
   /* Draw reading 3 - Humidity */
@@ -383,9 +392,9 @@ void update_Readings() {
   String ground_temp = "Gnd. Temp: ";
   tft->setCursor( 20, 212);
   if (fahrenheit) {
-    tft->println(air_temp + cToF(readings.peek().groundTemperature));
+    tft->println(air_temp + cToF(readings.peek().groundTemperature) + "F");
   } else {
-    tft->println(air_temp + readings.peek().groundTemperature);
+    tft->println(air_temp + readings.peek().groundTemperature + "C");
   }
 }
 
