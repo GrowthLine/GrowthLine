@@ -7,8 +7,8 @@
 #include <SHT1x.h>
 
 // Specify data and clock connections and instantiate SHT1x object
-#define dataPin  12
-#define clockPin 13
+#define dataPin  6
+#define clockPin 7
 SHT1x sht1x(dataPin, clockPin);
 
 void setup()

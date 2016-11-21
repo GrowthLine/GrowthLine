@@ -150,7 +150,7 @@ void Sensors::setupSensors() {
 /* calls the read function of each sensor and returns a reading
     object with all the reads
 */
-Reading* Sensors::getReading() {
+Reading Sensors::getReading() {
   Reading reading;
   for ( uint8_t i = 0; i < sensors.count(); i++) {
     Sensor *s = sensors.pop();
@@ -162,7 +162,7 @@ Reading* Sensors::getReading() {
     s->read();
     sensors.push(s);
   }
-  return &reading;
+  return reading;
 }
 
 /* returns a pointer to the sensor who's ID matches the given ID */

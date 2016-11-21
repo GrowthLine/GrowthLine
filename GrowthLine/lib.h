@@ -154,7 +154,7 @@ class Sensors {
     Sensors();
     void addSensor(Sensor *s);
     void setupSensors();
-    Reading* getReading();
+    Reading getReading();
     Sensor* getSensor(uint8_t id);
 };
 
