@@ -44,18 +44,26 @@ void setup() {
   sensors.setupSensors();
 
   /* Setting up the SD card */
-  File settingsFile;
+    /* Setting up the SD card */
+  if( !SD.exists("settings.txt")) {
+    File settingsFile = SD.open("settings.txt");
+    settingsFile.println("TempUnit=C");
+    settingsFile.println("LogFile=1");
+    settingsFile.println("Reading=1");
+    settingsFile.close();
+  }
+
+  // If the settings file is missing, make it with the defaults
   if (! SD.begin(SD_CS_PIN)) {
     Serial.println("SD card initialization failed!");
     saveEnable = false;
   }
-  else
-    settingsFile = SD.open("settings.txt");
-
-  char tempSetting = ' ';
-  while (settingsFile.available()) {
-    tempSetting = settingsFile.read();
-
+  else {
+    File settingsFile = SD.open("settings.txt");
+    while(settingsFile.read() != '=');                // find the first = sign, which indicates temp. unit
+    if(settingsFile.read() == 'F')
+      fahrenheit = true;
+    
   }
   /* check that touch screen is started propperly */
   while (true) {
