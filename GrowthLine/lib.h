@@ -1,3 +1,9 @@
+/* Changable Parameters */
+#define READING_FREQUENCY 2000                  // Length in milliseconds before each reading
+#define NUMBER_OF_READINGS 5                    // Number of readings we will hold before discarding old one
+#define WARMUP_LENGTH 5000                      // length of the warm up in milliseconds
+#define WARMUP_TOLERANCE 0.05                   // Value used to set how how apart should values be from average
+
 // Different device states
 #define READY_STATE 0
 #define WARMUP_STATE 1
@@ -42,6 +48,11 @@
 #define BTN_NW   2
 #define BTN_SW   3
 #define BTN_SE   4
+
+// Reading Classifications
+#define BAD_LOW   0
+#define GOOD      1
+#define BAD_HIGH  2
 
 /* Library needed for the Queue List */
 #include <QueueList.h>

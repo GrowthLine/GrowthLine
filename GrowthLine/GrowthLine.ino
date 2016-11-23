@@ -1,10 +1,5 @@
 #include "lib.h"
 
-/* Changable Parameters */
-#define READING_FREQUENCY 2000                  // Length in milliseconds before each reading
-#define NUMBER_OF_READINGS 5                    // Number of readings we will hold before discarding old one
-#define WARMUP_LENGTH 5000                      // length of the warm up in milliseconds
-
 /* Variable Declarations */
 QueueList<Reading> readings;                   // List used to hold reading objects. Structured in a queue.
 Sensors sensors;                                // Object that will hold and manage all other sensors
@@ -123,7 +118,7 @@ void loop() {
         milliseconds = millis();
       }
 
-      while (!stableReadings(&readings)) {        // Get readings without saving for several seconds without saving to warm up
+      while (!stableReadings(&readings)) {        
         milliseconds = millis();
         while ( millis() - milliseconds < READING_FREQUENCY);
         if (readings.count() == NUMBER_OF_READINGS)
@@ -169,7 +164,7 @@ void loop() {
       // ******** Save to SD card code here ******
       deviceState = READY_STATE;
       redraw = true;
-      statusBar = "Log Saved";
+      statusBar = "Read Saved";
       while(!readings.isEmpty())
         readings.pop();
       break;

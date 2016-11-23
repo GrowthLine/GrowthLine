@@ -25,7 +25,7 @@ float cToF(float c) {
 
 /* analyzse the readings list and see if the readings are stable */
 bool stableReadings(QueueList<Reading> *readings) {
-  const float tolerance = 0.05;
+  const float tolerance = WARMUP_TOLERANCE;
   Statistic phStats;
   phStats.clear();
   Statistic grndTempStats;
