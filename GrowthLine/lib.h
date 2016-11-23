@@ -46,6 +46,9 @@
 /* Library needed for the Queue List */
 #include <QueueList.h>
 
+/* Library needed for statistica calculations */
+#include <Statistic.h>
+
 /* Library needed for Touch LCD */
 #include <Adafruit_GFX.h>
 #include <gfxfont.h>
@@ -89,7 +92,7 @@ class Sensor {
     Reading *reading;
     uint8_t ID;
     Sensor() {}
-    //virtual ~Sensor();
+    ~Sensor();
     virtual void read() = 0;
     virtual void setUp() = 0;
     virtual void setReading(Reading *r);
@@ -158,5 +161,8 @@ class Sensors {
     Sensor* getSensor(uint8_t id);
 };
 
-
+/* General Functions */
+uint8_t getQuadrantFromPoint(TS_Point *p);
+float cToF(float c);
+bool stableReadings(QueueList<Reading> *readings);
 

@@ -1,5 +1,62 @@
 #include "lib.h"
 
+/* ~~~~~~~~~~~~~~~~~~~~~~~ General Functions ~~~~~~~~~~~~~~~~~~~~~~~ */
+/* Finds the quadrant touched by the user on the screen */
+ uint8_t getQuadrantFromPoint(TS_Point *p) {
+  if ( p->x > TS_MAXX / 2 && p->y < TS_MAXY / 2) {
+    return BTN_NW;
+  }
+  if ( p->x < TS_MAXX / 2 && p->y < TS_MAXY / 2) {
+    return BTN_SW;
+  }
+  if ( p->x < TS_MAXX / 2 && p->y > TS_MAXY / 2) {
+    return BTN_SE;
+  }
+  if ( p->x > TS_MAXX / 2 && p->y > TS_MAXY / 2) {
+    return BTN_NE;
+  }
+  return BTN_NONE;
+}
+
+/* converts Celsious to Fahrenheit */
+float cToF(float c) {
+  return c * 1.8 + 32;
+}
+
+/* analyzse the readings list and see if the readings are stable */
+bool stableReadings(QueueList<Reading> *readings) {
+  const float tolerance = 0.05;
+  Statistic phStats;
+  phStats.clear();
+  Statistic grndTempStats;
+  grndTempStats.clear();
+  Statistic moistureStats;
+  moistureStats.clear();
+  Statistic airTempStats;
+  airTempStats.clear();
+  Statistic humidityStats;
+  humidityStats.clear();
+
+  for( int i = 0; i < readings->count(); i++) {
+    phStats.add(readings->peek().pH);
+    grndTempStats.add(readings->peek().groundTemperature);
+    moistureStats.add(readings->peek().moisture);
+    airTempStats.add(readings->peek().airTemperature);
+    humidityStats.add(readings->peek().humidity);
+  }
+  if(phStats.unbiased_stdev() >= phStats.average() * tolerance)
+    return false;
+  if(grndTempStats.unbiased_stdev() >= grndTempStats.average() * tolerance)
+    return false;
+  if(moistureStats.unbiased_stdev() >= moistureStats.average() * tolerance)
+    return false;
+  if(airTempStats.unbiased_stdev() >= airTempStats.average() * tolerance)
+    return false;
+  if(humidityStats.unbiased_stdev() >= humidityStats.average() * tolerance)
+    return false;
+  return true;
+}
+
 /* ~~~~~~~~~~~~~~~~~~~~~~~ Reading Class ~~~~~~~~~~~~~~~~~~~~~~~ */
 Reading::Reading( float l, float aT, float h, float ph, float gT, float m ) {
   lux = l;
@@ -22,7 +79,7 @@ String Reading::toString() {
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~ Sensor Abstract Class ~~~~~~~~~~~~~~~~~~~~~~~ */
 
-//Sensor::~Sensor() {}                                                        // Needed to destruct the Sensor objects
+Sensor::~Sensor() {}                                                        // Needed to destruct the Sensor objects
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~ Light Sensor Class ~~~~~~~~~~~~~~~~~~~~~~~ */
 LightSensor::LightSensor() {
@@ -109,7 +166,7 @@ void pH::calibrate() {
     serial->read();
 }
 
-/* ~~~~~~~~~~~~~~~~~~~~~~~ Temperatue / Moisture Class ~~~~~~~~~~~~~~~~~~~~~~~ */  // Not done Yet
+/* ~~~~~~~~~~~~~~~~~~~~~~~ Temperatue / Moisture Class ~~~~~~~~~~~~~~~~~~~~~~~ */ 
 TempMoist::TempMoist(uint8_t d, uint8_t c) {
   ID = TEMP_MOIST_SENSOR_ID;
   dataPin = d;
@@ -179,6 +236,7 @@ Sensor* Sensors::getSensor(uint8_t id) {
   }
   return NULL;
 }
+
 
 
 

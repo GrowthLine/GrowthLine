@@ -16,9 +16,9 @@ bool tempChange;                                // Flag used to ID when to redra
 unsigned long milliseconds;                     // saves milliseconds. Used with millis() to check lenths of time
 unsigned int readingNumber;                     // holds the current value that will be used to write to SD card
 unsigned int logFileNumber;                     // holds the current log file number
+String statusBar;                               // holds the message displayed on the status bar
 Adafruit_STMPE610 *ts;                          // pointer to a touch screen object
 Adafruit_ILI9341 *tft;                          // pointer to a display object
-String statusBar;                               // holds the message displayed on the status bar
 
 void setup() {
   Serial.begin(9600);
@@ -44,8 +44,8 @@ void setup() {
   sensors.setupSensors();
 
   /* Setting up the SD card */
-    /* Setting up the SD card */
-  if( !SD.exists("settings.txt")) {
+  /* Setting up the SD card */
+  if ( !SD.exists("settings.txt")) {
     File settingsFile = SD.open("settings.txt");
     settingsFile.println("TempUnit=C");
     settingsFile.println("LogFile=1");
@@ -60,10 +60,10 @@ void setup() {
   }
   else {
     File settingsFile = SD.open("settings.txt");
-    while(settingsFile.read() != '=');                // find the first = sign, which indicates temp. unit
-    if(settingsFile.read() == 'F')
+    while (settingsFile.read() != '=');               // find the first = sign, which indicates temp. unit
+    if (settingsFile.read() == 'F')
       fahrenheit = true;
-    
+
   }
   /* check that touch screen is started propperly */
   while (true) {
@@ -84,201 +84,196 @@ void setup() {
    flickering.
 */
 void loop() {
-    // Determine if the screen was touched and on which quadrant
-    TS_Point touchedPoint;
-    uint8_t touchedQuadrant = BTN_NONE;
-    while (ts->touched()) {
-      touchedPoint = ts->getPoint();
-      if ( touchedPoint.z < 75 )
-        touchedQuadrant = getQuadrantFromPoint(&touchedPoint);
-    }
-  
-    // State Machine of the device
-    switch (deviceState) {
-      case READY_STATE:
-        if (redraw) {
-          draw_MainMenu();
-          redraw = false;
-        }
-        switch (touchedQuadrant) {
-          case BTN_NE:
-            deviceState = MENU_STATE;
-            redraw = true;
-            break;
-          case BTN_NW:
-            deviceState = WARMUP_STATE;
-            redraw = true;
-            break;
-        }
-        break;
-      case WARMUP_STATE:
-        if (redraw) {
-          draw_WarmUpScreen();
-          redraw = false;
-        }
-        milliseconds = millis();
-        while (millis() - milliseconds < WARMUP_LENGTH)    // Get readings without saving for several seconds without saving to warm up
-          sensors.getReading();
-        deviceState = READ_STATE;
-        redraw = true;
-        break;
-      case READ_STATE:
-        if (redraw) {
-          draw_ReadScreen();
-          redraw = false;
-        }
-        switch (touchedQuadrant) {
-          case BTN_NE:
-            if (saveEnable) { // if save button is pressed, save and go back to main menu
-              deviceState = SAVE_STATE;
-              redraw = true;
-            }
-            break;
-          case BTN_NW:      // if stop button is pressed, do not save and go back to main menu
-            deviceState = READY_STATE;
-            redraw = true;
-            statusBar = "GrowthLine";
-            break;
-        }
-        if ( millis() - milliseconds > READING_FREQUENCY) {   // updates displayed reading
-          if (readings.count() > NUMBER_OF_READINGS)
-            readings.pop();
-          readings.push( sensors.getReading() );
-          update_Readings();
-          milliseconds = millis();
-        }
-        break;
-      case SAVE_STATE:
-        if (redraw) {
-          draw_SaveScreen();
-          redraw = false;
-        }
-        // ******** Save to SD card code here ******
-        deviceState = READY_STATE;
-        redraw = true;
-        statusBar = "Log Saved";
-        break;
-      case MENU_STATE:
-        if (redraw) {
-          draw_MenuScreen();
-          redraw = false;
-        }
-        switch (touchedQuadrant) {
-          case BTN_NE:
-            deviceState = SETTINGS_STATE;
-            redraw = true;
-            break;
-          case BTN_NW:
-            deviceState = READY_STATE;
-            redraw = true;
-            statusBar = "GrowthLine";
-            break;
-          case BTN_SW:
-            deviceState = LOG_STATE;
-            redraw = true;
-            break;
-          case BTN_SE:
-            deviceState = SHUTDOWN_STATE;
-            redraw = true;
-            break;
-        }
-        break;
-      case SETTINGS_STATE:
-        if (redraw) {
-          draw_SettingsScreen();
-          redraw = false;
-        }
-        if (tempChange) {
-          draw_TempButtons();
-          tempChange = false;
-        }
-        switch (touchedQuadrant) {
-          case BTN_NE:
-            if ( fahrenheit ) {
-              fahrenheit = false;
-            } else {
-              fahrenheit = true;
-            }
-            tempChange = true;
-            break;
-          case BTN_NW:
-            deviceState = MENU_STATE;
-            redraw = true;
-            break;
-          case BTN_SW:
-            deviceState = CALIBRATE_STATE;
-            redraw = true;
-            break;
-          case BTN_SE:
-            deviceState = READY_STATE;
-            redraw = true;
-            statusBar = "NewLogFile";
-            break;
-        }
-        break;
-      case CALIBRATE_STATE:
-        if (redraw) {
-          draw_CalibrateScreen();
-          redraw = false;
-        }
-        if (touchedQuadrant == BTN_NW) {                      // if stop button is pressed, do not save and go back to menu
+  // Determine if the screen was touched and on which quadrant
+  TS_Point touchedPoint;
+  uint8_t touchedQuadrant = BTN_NONE;
+  while (ts->touched()) {
+    touchedPoint = ts->getPoint();
+    if ( touchedPoint.z < 75 )
+      touchedQuadrant = getQuadrantFromPoint(&touchedPoint);
+  }
+
+  // State Machine of the device
+  switch (deviceState) {
+    case READY_STATE:
+      if (redraw) {
+        draw_MainMenu();
+        redraw = false;
+      }
+      switch (touchedQuadrant) {
+        case BTN_NE:
           deviceState = MENU_STATE;
           redraw = true;
-        }
-        else if ( touchedQuadrant == BTN_NE) {                // if go button is pressed, calibrate pH sensor
-          pH *phSensor = (pH*)sensors.getSensor(PH_SENSOR_ID);
-          phSensor->calibrate();
+          break;
+        case BTN_NW:
+          deviceState = WARMUP_STATE;
+          redraw = true;
+          break;
+      }
+      break;
+    case WARMUP_STATE:
+      if (redraw) {
+        draw_WarmUpScreen();
+        redraw = false;
+      }
+      milliseconds = millis();
+      for( int i = 0; i < 5; i++ ){                         // get initial 5 readings
+        readings.push( sensors.getReading() );
+        while(millis() - milliseconds < READING_FREQUENCY);
+        milliseconds = millis();
+      }
+
+      while (!stableReadings(&readings)) {        // Get readings without saving for several seconds without saving to warm up
+        milliseconds = millis();
+        while ( millis() - milliseconds < READING_FREQUENCY);
+        if (readings.count() == NUMBER_OF_READINGS)
+          readings.pop();
+        readings.push( sensors.getReading() );
+      }
+      deviceState = READ_STATE;
+      redraw = true;
+      break;
+    case READ_STATE:
+      if (redraw) {
+        draw_ReadScreen();
+        redraw = false;
+      }
+      switch (touchedQuadrant) {
+        case BTN_NE:
+          if (saveEnable) {             // if save button is pressed, save and go back to main menu
+            deviceState = SAVE_STATE;
+            redraw = true;
+          }
+          break;
+        case BTN_NW:                   // if stop button is pressed, do not save and go back to main menu
           deviceState = READY_STATE;
           redraw = true;
-          statusBar = "Calibrated";
-        }
-        break;
-      case LOG_STATE:
-        if (redraw) {
-  
-          redraw = false;
-        }
-        if ( touchedQuadrant == BTN_NW) {
+          statusBar = "GrowthLine";
+          while(!readings.isEmpty())  // Clear the readings list
+            readings.pop();
+          break;
+      }
+      if ( millis() - milliseconds > READING_FREQUENCY) {   // updates displayed reading
+        update_Readings();
+        if (readings.count() == NUMBER_OF_READINGS)
+          readings.pop();
+        readings.push( sensors.getReading() );
+        milliseconds = millis();
+      }
+      break;
+    case SAVE_STATE:
+      if (redraw) {
+        draw_SaveScreen();
+        redraw = false;
+      }
+      // ******** Save to SD card code here ******
+      deviceState = READY_STATE;
+      redraw = true;
+      statusBar = "Log Saved";
+      while(!readings.isEmpty())
+        readings.pop();
+      break;
+    case MENU_STATE:
+      if (redraw) {
+        draw_MenuScreen();
+        redraw = false;
+      }
+      switch (touchedQuadrant) {
+        case BTN_NE:
+          deviceState = SETTINGS_STATE;
+          redraw = true;
+          break;
+        case BTN_NW:
+          deviceState = READY_STATE;
+          redraw = true;
+          statusBar = "GrowthLine";
+          break;
+        case BTN_SW:
+          deviceState = LOG_STATE;
+          redraw = true;
+          break;
+        case BTN_SE:
+          deviceState = SHUTDOWN_STATE;
+          redraw = true;
+          break;
+      }
+      break;
+    case SETTINGS_STATE:
+      if (redraw) {
+        draw_SettingsScreen();
+        redraw = false;
+      }
+      if (tempChange) {
+        draw_TempButtons();
+        tempChange = false;
+      }
+      switch (touchedQuadrant) {
+        case BTN_NE:
+          if ( fahrenheit ) {
+            fahrenheit = false;
+          } else {
+            fahrenheit = true;
+          }
+          tempChange = true;
+          break;
+        case BTN_NW:
           deviceState = MENU_STATE;
           redraw = true;
-        }
-        else if ( touchedQuadrant == BTN_NE) {
-          /*** get the next 5 readings here ****/
+          break;
+        case BTN_SW:
+          deviceState = CALIBRATE_STATE;
           redraw = true;
-        }
-        break;
-      case SHUTDOWN_STATE:      // ******** Need to do this one ******* ///
-        if (redraw) {
-          draw_ShutdownScreen();
-          redraw = false;
-        }
-        break;
-      default:
-        break;
-    }
+          break;
+        case BTN_SE:
+          deviceState = READY_STATE;
+          redraw = true;
+          statusBar = "NewLogFile";
+          break;
+      }
+      break;
+    case CALIBRATE_STATE:
+      if (redraw) {
+        draw_CalibrateScreen();
+        redraw = false;
+      }
+      if (touchedQuadrant == BTN_NW) {                      // if stop button is pressed, do not save and go back to menu
+        deviceState = MENU_STATE;
+        redraw = true;
+      }
+      else if ( touchedQuadrant == BTN_NE) {                // if go button is pressed, calibrate pH sensor
+        pH *phSensor = (pH*)sensors.getSensor(PH_SENSOR_ID);
+        phSensor->calibrate();
+        deviceState = READY_STATE;
+        redraw = true;
+        statusBar = "Calibrated";
+      }
+      break;
+    case LOG_STATE:
+      if (redraw) {
+
+        redraw = false;
+      }
+      if ( touchedQuadrant == BTN_NW) {
+        deviceState = MENU_STATE;
+        redraw = true;
+      }
+      else if ( touchedQuadrant == BTN_NE) {
+        /*** get the next 5 readings here ****/
+        redraw = true;
+      }
+      break;
+    case SHUTDOWN_STATE:      // ******** Need to do this one ******* ///
+      if (redraw) {
+        draw_ShutdownScreen();
+        redraw = false;
+      }
+      break;
+    default:
+      break;
+  }
 }
 
-uint8_t getQuadrantFromPoint(TS_Point *p) {
-  if ( p->x > TS_MAXX / 2 && p->y < TS_MAXY / 2) {
-    return BTN_NW;
-  }
-  if ( p->x < TS_MAXX / 2 && p->y < TS_MAXY / 2) {
-    return BTN_SW;
-  }
-  if ( p->x < TS_MAXX / 2 && p->y > TS_MAXY / 2) {
-    return BTN_SE;
-  }
-  if ( p->x > TS_MAXX / 2 && p->y > TS_MAXY / 2) {
-    return BTN_NE;
-  }
-
-  return BTN_NONE;
-}
-
-float cToF(float c) {
-  return c * 1.8 + 32;
-}
-
+/* Display Functions */
 void draw_MainMenu() {
   // Blank screen
   tft->fillScreen(ILI9341_BLACK);
