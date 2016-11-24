@@ -16,6 +16,7 @@ String statusBar;                               // holds the message displayed o
 Adafruit_STMPE610 *ts;                          // pointer to a touch screen object
 Adafruit_ILI9341 *tft;                          // pointer to a display object
 
+
 void setup() {
   Serial.begin(9600);
   readings.setPrinter(Serial);
@@ -26,7 +27,12 @@ void setup() {
   tempChange    = true;
   currentRead   = 1;
   statusBar     = "GrowthLine";
+<<<<<<< HEAD
   logFileNumber = 1;
+=======
+  String logNumberBuffer = "";                     // holds the settings from the buffer
+  String lineReadBuffer = "";
+>>>>>>> origin/master
 
   /* Add the sensors to our Sensors object */
   sensors.addSensor(new LightSensor());
@@ -43,25 +49,50 @@ void setup() {
 
   /* Setting up the SD card */
   /* Setting up the SD card */
-  if ( !SD.exists("settings.txt")) {
-    File settingsFile = SD.open("settings.txt");
-    settingsFile.println("TempUnit=C");
-    settingsFile.println("LogFile=1");
-    settingsFile.println("Reading=1");
-    settingsFile.close();
-  }
 
   // If the settings file is missing, make it with the defaults
   if (! SD.begin(SD_CS_PIN)) {
     Serial.println("SD card initialization failed!");
     saveEnable = false;
   }
-  else {
-    File settingsFile = SD.open("settings.txt");
-    while (settingsFile.read() != '=');               // find the first = sign, which indicates temp. unit
-    if (settingsFile.read() == 'F')
-      fahrenheit = true;
-
+  else{
+    if ( !SD.exists("settings.txt")) {
+      File settingsFile = SD.open("settings.txt");
+      settingsFile.println("TempUnit=C");
+      settingsFile.println("LogFile=1");
+      settingsFile.println("Reading=1");
+      settingsFile.close();
+    }
+    else {
+      File settingsFile = SD.open("settings.txt");
+      while (settingsFile.read() != '=');               // find the first = sign, which indicates temp. unit
+      if (settingsFile.read() == 'F')
+        fahrenheit = true;
+      while(settingsFile.read() == '='){
+        while(settingsFile.peek() !='\n'){
+          logNumberBuffer += settingsFile.read();
+        }
+      }
+      while(settingsFile.read() == '='){
+        while(settingsFile.peek() !='\n'){
+          lineReadBuffer += settingsFile.read();
+        }
+      }
+      if(logNumberBuffer.toInt() != 0){
+        logFileNumber = logNumberBuffer.toInt();
+      }
+      else{
+        logFileNumber = 1;
+      }
+      if(lineReadBuffer.toInt() != 0){
+        readingNumber = lineReadBuffer.toInt();
+      }
+      else{
+        readingNumber = 1;
+      }
+      
+    }
+    
   }
   /* check that touch screen is started propperly */
   while (true) {
@@ -649,6 +680,44 @@ void update_Logs(String in_array[]) {
     tft->setCursor( 20, 142 + (i * 20));
     tft->println(in_array[i]);
     Serial.println(in_array[i]);
+  }
+}
+
+//Overwrite "settings.txt" when changes are made
+void newSettings (){
+  if (saveEnable){
+      SD.remove("settings.txt");
+      File settingsFile = SD.open("settings.txt");
+      settingsFile.println("TempUnit=" + fahrenheit? "F" : "C" );
+      settingsFile.println("LogFile=" + String(logFileNumber));
+      settingsFile.println("Reading=" + String(readingNumber));
+      settingsFile.close();
+  }
+}
+
+//Save log to SD card
+void saveLog(){
+  String logFileName = "log" + String(logFileNumber) + ".txt";
+  if(SD.exists(logFileName)){
+    File logFile = SD.open(logFileName, FILE_WRITE);
+    logFile.println(String(readingNumber)+ "," + readings.peek().toString());
+    logFile.close();
+  }
+  else{
+    Serial.println("Log File Not Found!");
+  }
+}
+
+void checkLogExists(){
+  String logFileName = "log" + String(logFileNumber) + ".txt";
+  String fileHeader = "Reading Number,Soil Temperature,Soil Moisture,Soil pH,Air Temperature,Air Humidity,Lux";
+  if(!SD.exists(logFileName)){
+    File logFile = SD.open(logFileName, FILE_WRITE);
+    logFile.println(fileHeader);
+    logFile.close();
+  }
+  else{
+    Serial.println("Log File Found!");
   }
 }
 
