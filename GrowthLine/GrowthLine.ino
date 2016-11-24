@@ -554,3 +554,14 @@ void draw_LogScreen(String in_array[]) {
   }
 }
 
+void newSettings (){
+  if (saveEnable){
+      SD.remove("settings.txt");
+      File settingsFile = SD.open("settings.txt");
+      settingsFile.println("TempUnit=" + fahrenheit? "F" : "C" );
+      settingsFile.println("LogFile=" + String(logFileNumber));
+      settingsFile.println("Reading=" + String(readingNumber));
+      settingsFile.close();
+  }
+}
+
