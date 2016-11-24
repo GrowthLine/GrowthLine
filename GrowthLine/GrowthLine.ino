@@ -11,6 +11,7 @@ bool tempChange;                                // Flag used to ID when to redra
 unsigned long milliseconds;                     // saves milliseconds. Used with millis() to check lenths of time
 unsigned int readingNumber;                     // holds the current value that will be used to write to SD card
 unsigned int logFileNumber;                     // holds the current log file number
+unsigned int currentRead;                       // holds a value of the latest read displayed on the log screen
 String statusBar;                               // holds the message displayed on the status bar
 Adafruit_STMPE610 *ts;                          // pointer to a touch screen object
 Adafruit_ILI9341 *tft;                          // pointer to a display object
@@ -23,7 +24,9 @@ void setup() {
   fahrenheit    = false;
   saveEnable    = true;
   tempChange    = true;
+  currentRead   = 1;
   statusBar     = "GrowthLine";
+  logFileNumber = 1;
 
   /* Add the sensors to our Sensors object */
   sensors.addSensor(new LightSensor());
@@ -112,13 +115,13 @@ void loop() {
         redraw = false;
       }
       milliseconds = millis();
-      for( int i = 0; i < 5; i++ ){                         // get initial 5 readings
+      for ( int i = 0; i < 5; i++ ) {                       // get initial 5 readings
         readings.push( sensors.getReading() );
-        while(millis() - milliseconds < READING_FREQUENCY);
+        while (millis() - milliseconds < READING_FREQUENCY);
         milliseconds = millis();
       }
 
-      while (!stableReadings(&readings)) {        
+      while (!stableReadings(&readings)) {
         milliseconds = millis();
         while ( millis() - milliseconds < READING_FREQUENCY);
         if (readings.count() == NUMBER_OF_READINGS)
@@ -144,7 +147,7 @@ void loop() {
           deviceState = READY_STATE;
           redraw = true;
           statusBar = "GrowthLine";
-          while(!readings.isEmpty())  // Clear the readings list
+          while (!readings.isEmpty()) // Clear the readings list
             readings.pop();
           break;
       }
@@ -165,7 +168,7 @@ void loop() {
       deviceState = READY_STATE;
       redraw = true;
       statusBar = "Read Saved";
-      while(!readings.isEmpty())
+      while (!readings.isEmpty())
         readings.pop();
       break;
     case MENU_STATE:
@@ -184,8 +187,10 @@ void loop() {
           statusBar = "GrowthLine";
           break;
         case BTN_SW:
-          deviceState = LOG_STATE;
-          redraw = true;
+          if ( saveEnable ) {
+            deviceState = LOG_STATE;
+            redraw = true;
+          }
           break;
         case BTN_SE:
           deviceState = SHUTDOWN_STATE;
@@ -245,16 +250,89 @@ void loop() {
       break;
     case LOG_STATE:
       if (redraw) {
-
+        String fileName = "log";
+        File logFile = SD.open("log1.txt");
+        String logs[5] = {"", "", "", "", ""};
+        String currentLog = "";
+        uint8_t counter = 0;
+        Serial.println("Entering Loop");
+        bool use = true;
+        uint8_t commaCount = 0;
+        while( logFile.available() ) {
+          if( counter == 5 )
+            break;
+          char current = logFile.read();
+          if( current == '\n') {
+            counter += 1;
+            commaCount = 0;
+            use = true;
+            continue;
+          }
+          if( current == '.' && commaCount != 3) {
+            use = false;
+            continue;
+          }
+          else if( current == ',') {
+            commaCount += 1;
+            use = true;
+          }
+          if( use )
+            logs[counter] += current;  
+        }
+        logFile.close();
+        Serial.println("Closing file and drawing");
+        draw_LogScreen(logs);
+        Serial.println("Drawing complete");
+        currentRead = counter;
         redraw = false;
       }
       if ( touchedQuadrant == BTN_NW) {
         deviceState = MENU_STATE;
+        currentRead = 0;
         redraw = true;
       }
       else if ( touchedQuadrant == BTN_NE) {
-        /*** get the next 5 readings here ****/
-        redraw = true;
+        Serial.println("Printing the next logs");
+        String fileName = "log";
+        String logs[5] = {"", "", "", "", ""};
+        File logFile = SD.open(fileName + logFileNumber + ".txt");
+        String currentLog = "";
+        uint8_t logCounter = 0;
+        while(logCounter != currentRead && logFile.available() ) {
+          if(logFile.read() == '\n')
+            logCounter +=1 ;
+        }
+        uint8_t counter = 0;
+        Serial.println("Entering Loop");
+        bool use = true;
+        uint8_t commaCount = 0;
+        while( logFile.available() ) {
+          if( counter == 5 )
+            break;
+          char current = logFile.read();
+          Serial.print(current);
+          if( current == '\n') {
+            counter += 1;
+            commaCount = 0;
+            use = true;
+            continue;
+          }
+          if( current == '.' && commaCount != 3) {
+            use = false;
+            continue;
+          }
+          else if( current == ',') {
+            commaCount += 1;
+            use = true;
+          }
+          if( use )
+            logs[counter] += current;  
+        }
+        logFile.close();
+        Serial.println("updating logs");
+        update_Logs(logs);
+        Serial.println("Logs Done");
+        currentRead += counter;
       }
       break;
     case SHUTDOWN_STATE:      // ******** Need to do this one ******* ///
@@ -376,16 +454,44 @@ void update_Readings() {
   tft->println(humidity + readings.peek().humidity);
 
   /* Draw reading 4 - Soil pH */
+  switch (phStatus(readings.peek().pH)) {
+    case BAD_LOW:
+      tft->setTextColor( ILI9341_BLUE, ILI9341_BLACK);
+      break;
+    case GOOD:
+      tft->setTextColor( ILI9341_GREEN, ILI9341_BLACK);
+      break;
+    case BAD_HIGH:
+      tft->setTextColor( ILI9341_RED, ILI9341_BLACK);
+      break;
+    default:
+      break;
+  }
   String ph          = "pH       : ";
   tft->setCursor( 20, 172);
   tft->println(ph + readings.peek().pH);
 
   /* Draw reading 5 - Soil moisture  */
+  tft->setTextColor( ILI9341_WHITE, ILI9341_BLACK);
   String moisture    = "Moisture : ";
   tft->setCursor( 20, 192);
   tft->println(moisture + readings.peek().moisture);
 
-  /* Draw reading 6 - Ground temperature */
+  /* Draw rea
+    ding 6 - Ground temperature */
+  switch (groundTempStatus(readings.peek().groundTemperature)) {
+    case BAD_LOW:
+      tft->setTextColor( ILI9341_BLUE, ILI9341_BLACK);
+      break;
+    case GOOD:
+      tft->setTextColor( ILI9341_GREEN, ILI9341_BLACK);
+      break;
+    case BAD_HIGH:
+      tft->setTextColor( ILI9341_RED, ILI9341_BLACK);
+      break;
+    default:
+      break;
+  }
   String ground_temp = "Gnd. Temp: ";
   tft->setCursor( 20, 212);
   if (fahrenheit) {
@@ -519,10 +625,30 @@ void draw_LogScreen(String in_array[]) {
   tft->setTextColor( ILI9341_BLACK, ILI9341_GREEN);
   tft->println("Next");
 
+  /* Output headers */
+  tft->setTextSize(2);
+  tft->setTextColor( ILI9341_WHITE, ILI9341_BLACK);
+  tft->setCursor( 20, 122);
+  tft->println("# gT Moi pH aT Hum Lux");
+  
   /* Output lines */
-  for (int i = 0; i < 6; i++) {
-    tft->setCursor( 20, 82 + (i * 30));
+  for (int i = 0; i < 5; i++) {
+    tft->setCursor( 20, 142 + (i * 20));
     tft->println(in_array[i]);
+  }
+}
+
+void update_Logs(String in_array[]) {
+  /* Blank out logs */
+  tft->fillRect(20, 142, 280, 100, ILI9341_BLACK);
+
+  /* Output lines */
+  tft->setTextSize(2);
+  tft->setTextColor( ILI9341_WHITE, ILI9341_BLACK);
+  for (int i = 0; i < 5; i++) {
+    tft->setCursor( 20, 142 + (i * 20));
+    tft->println(in_array[i]);
+    Serial.println(in_array[i]);
   }
 }
 

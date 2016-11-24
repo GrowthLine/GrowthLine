@@ -2,7 +2,7 @@
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~ General Functions ~~~~~~~~~~~~~~~~~~~~~~~ */
 /* Finds the quadrant touched by the user on the screen */
- uint8_t getQuadrantFromPoint(TS_Point *p) {
+uint8_t getQuadrantFromPoint(TS_Point *p) {
   if ( p->x > TS_MAXX / 2 && p->y < TS_MAXY / 2) {
     return BTN_NW;
   }
@@ -16,6 +16,27 @@
     return BTN_NE;
   }
   return BTN_NONE;
+}
+
+uint8_t phStatus(float ph) {
+  if ( ph < GOOD_LOW_PH && ph > 0 )
+    return BAD_LOW;
+  else if ( ph >= GOOD_LOW_PH && ph <= GOOD_HIGH_PH)
+    return GOOD;
+  else if ( ph > GOOD_HIGH_PH && ph < 14 )
+    return BAD_HIGH;
+  else
+    return UNKNOWN;
+}
+uint8_t groundTempStatus(float t) {
+  if ( t < GOOD_LOW_GROUND_TEMPERATURE && t > 0 )
+    return BAD_LOW;
+  else if ( t >= GOOD_LOW_GROUND_TEMPERATURE && t <= GOOD_HIGH_GROUND_TEMPERATURE)
+    return GOOD;
+  else if ( t > GOOD_HIGH_GROUND_TEMPERATURE && t < 14 )
+    return BAD_HIGH;
+  else
+    return UNKNOWN;
 }
 
 /* converts Celsious to Fahrenheit */
@@ -37,22 +58,22 @@ bool stableReadings(QueueList<Reading> *readings) {
   Statistic humidityStats;
   humidityStats.clear();
 
-  for( int i = 0; i < readings->count(); i++) {
+  for ( int i = 0; i < readings->count(); i++) {
     phStats.add(readings->peek().pH);
     grndTempStats.add(readings->peek().groundTemperature);
     moistureStats.add(readings->peek().moisture);
     airTempStats.add(readings->peek().airTemperature);
     humidityStats.add(readings->peek().humidity);
   }
-  if(phStats.unbiased_stdev() >= phStats.average() * tolerance)
+  if (phStats.unbiased_stdev() >= phStats.average() * tolerance)
     return false;
-  if(grndTempStats.unbiased_stdev() >= grndTempStats.average() * tolerance)
+  if (grndTempStats.unbiased_stdev() >= grndTempStats.average() * tolerance)
     return false;
-  if(moistureStats.unbiased_stdev() >= moistureStats.average() * tolerance)
+  if (moistureStats.unbiased_stdev() >= moistureStats.average() * tolerance)
     return false;
-  if(airTempStats.unbiased_stdev() >= airTempStats.average() * tolerance)
+  if (airTempStats.unbiased_stdev() >= airTempStats.average() * tolerance)
     return false;
-  if(humidityStats.unbiased_stdev() >= humidityStats.average() * tolerance)
+  if (humidityStats.unbiased_stdev() >= humidityStats.average() * tolerance)
     return false;
   return true;
 }
@@ -71,9 +92,12 @@ Reading::Reading() {
   Reading( 0, 0, 0, 0, 0, 0);
 }
 
-String Reading::toString() {
+String Reading::toString(bool fah) {
   String line = "";
-  line = line + groundTemperature + "," + moisture + "," + pH + "," + airTemperature + "," + humidity + "," + lux;
+  if (fah)
+    line = line + cToF(groundTemperature) + "F," + moisture + "," + pH + "," + cToF(airTemperature) + "F," + humidity + "," + lux;
+  else
+    line = line + groundTemperature + "C," + moisture + "," + pH + "," + airTemperature + "C," + humidity + "," + lux;
   return line;
 }
 
@@ -147,9 +171,9 @@ void pH::read() {
       break;
     sensorString += inchar;
   }
-  while( serial->available() > 0)     // Clears the buffer
+  while ( serial->available() > 0)    // Clears the buffer
     serial->read();
-  
+
   reading->pH = sensorString.toFloat();
 }
 
@@ -162,11 +186,11 @@ void pH::setReading(Reading *r) {
 
 void pH::calibrate() {
   serial->print("Cal,mid,7.00\r");
-  while( serial->available() > 0)     // Clears the buffer
+  while ( serial->available() > 0)    // Clears the buffer
     serial->read();
 }
 
-/* ~~~~~~~~~~~~~~~~~~~~~~~ Temperatue / Moisture Class ~~~~~~~~~~~~~~~~~~~~~~~ */ 
+/* ~~~~~~~~~~~~~~~~~~~~~~~ Temperatue / Moisture Class ~~~~~~~~~~~~~~~~~~~~~~~ */
 TempMoist::TempMoist(uint8_t d, uint8_t c) {
   ID = TEMP_MOIST_SENSOR_ID;
   dataPin = d;

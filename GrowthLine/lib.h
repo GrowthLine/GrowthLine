@@ -3,6 +3,10 @@
 #define NUMBER_OF_READINGS 5                    // Number of readings we will hold before discarding old one
 #define WARMUP_LENGTH 5000                      // length of the warm up in milliseconds
 #define WARMUP_TOLERANCE 0.05                   // Value used to set how how apart should values be from average
+#define GOOD_LOW_PH 5.5
+#define GOOD_HIGH_PH 5.9
+#define GOOD_LOW_GROUND_TEMPERATURE 21.1111
+#define GOOD_HIGH_GROUND_TEMPERATURE 35.0000
 
 // Different device states
 #define READY_STATE 0
@@ -53,6 +57,7 @@
 #define BAD_LOW   0
 #define GOOD      1
 #define BAD_HIGH  2
+#define UNKNOWN   3
 
 /* Library needed for the Queue List */
 #include <QueueList.h>
@@ -94,7 +99,7 @@ class Reading {
 
     Reading( float, float, float, float, float, float );
     Reading();
-    String toString();
+    String toString(bool);
 };
 
 /* Abstract class, all sensors inherit from this */
@@ -176,4 +181,6 @@ class Sensors {
 uint8_t getQuadrantFromPoint(TS_Point *p);
 float cToF(float c);
 bool stableReadings(QueueList<Reading> *readings);
+uint8_t phStatus(float);
+uint8_t groundTempStatus(float);
 
