@@ -15,6 +15,7 @@ String statusBar;                               // holds the message displayed o
 Adafruit_STMPE610 *ts;                          // pointer to a touch screen object
 Adafruit_ILI9341 *tft;                          // pointer to a display object
 
+
 void setup() {
   Serial.begin(9600);
   readings.setPrinter(Serial);
@@ -24,6 +25,8 @@ void setup() {
   saveEnable    = true;
   tempChange    = true;
   statusBar     = "GrowthLine";
+  String logNumberBuffer = "";                     // holds the settings from the buffer
+  String lineReadBuffer = "";
 
   /* Add the sensors to our Sensors object */
   sensors.addSensor(new LightSensor());
@@ -40,25 +43,50 @@ void setup() {
 
   /* Setting up the SD card */
   /* Setting up the SD card */
-  if ( !SD.exists("settings.txt")) {
-    File settingsFile = SD.open("settings.txt");
-    settingsFile.println("TempUnit=C");
-    settingsFile.println("LogFile=1");
-    settingsFile.println("Reading=1");
-    settingsFile.close();
-  }
 
   // If the settings file is missing, make it with the defaults
   if (! SD.begin(SD_CS_PIN)) {
     Serial.println("SD card initialization failed!");
     saveEnable = false;
   }
-  else {
-    File settingsFile = SD.open("settings.txt");
-    while (settingsFile.read() != '=');               // find the first = sign, which indicates temp. unit
-    if (settingsFile.read() == 'F')
-      fahrenheit = true;
-
+  else{
+    if ( !SD.exists("settings.txt")) {
+      File settingsFile = SD.open("settings.txt");
+      settingsFile.println("TempUnit=C");
+      settingsFile.println("LogFile=1");
+      settingsFile.println("Reading=1");
+      settingsFile.close();
+    }
+    else {
+      File settingsFile = SD.open("settings.txt");
+      while (settingsFile.read() != '=');               // find the first = sign, which indicates temp. unit
+      if (settingsFile.read() == 'F')
+        fahrenheit = true;
+      while(settingsFile.read() == '='){
+        while(settingsFile.peek() !='\n'){
+          logNumberBuffer += settingsFile.read();
+        }
+      }
+      while(settingsFile.read() == '='){
+        while(settingsFile.peek() !='\n'){
+          lineReadBuffer += settingsFile.read();
+        }
+      }
+      if(logNumberBuffer.toInt() != 0){
+        logFileNumber = logNumberBuffer.toInt();
+      }
+      else{
+        logFileNumber = 1;
+      }
+      if(lineReadBuffer.toInt() != 0){
+        readingNumber = lineReadBuffer.toInt();
+      }
+      else{
+        readingNumber = 1;
+      }
+      
+    }
+    
   }
   /* check that touch screen is started propperly */
   while (true) {
@@ -112,13 +140,13 @@ void loop() {
         redraw = false;
       }
       milliseconds = millis();
-      for( int i = 0; i < 5; i++ ){                         // get initial 5 readings
+      for ( int i = 0; i < 5; i++ ) {                       // get initial 5 readings
         readings.push( sensors.getReading() );
-        while(millis() - milliseconds < READING_FREQUENCY);
+        while (millis() - milliseconds < READING_FREQUENCY);
         milliseconds = millis();
       }
 
-      while (!stableReadings(&readings)) {        
+      while (!stableReadings(&readings)) {
         milliseconds = millis();
         while ( millis() - milliseconds < READING_FREQUENCY);
         if (readings.count() == NUMBER_OF_READINGS)
@@ -144,7 +172,7 @@ void loop() {
           deviceState = READY_STATE;
           redraw = true;
           statusBar = "GrowthLine";
-          while(!readings.isEmpty())  // Clear the readings list
+          while (!readings.isEmpty()) // Clear the readings list
             readings.pop();
           break;
       }
@@ -165,7 +193,7 @@ void loop() {
       deviceState = READY_STATE;
       redraw = true;
       statusBar = "Read Saved";
-      while(!readings.isEmpty())
+      while (!readings.isEmpty())
         readings.pop();
       break;
     case MENU_STATE:
