@@ -305,7 +305,7 @@ Sensor* Sensors::getSensor(uint8_t id) {
 void newSettings (unsigned int logFileNumber, unsigned int readingNumber, bool saveEnable, bool fahrenheit){
   if (saveEnable){
       SD.remove("settings.txt");
-      File settingsFile = SD.open("settings.txt");
+      File settingsFile = SD.open("settings.txt", FILE_WRITE);
       settingsFile.println("TempUnit=" + fahrenheit? "F" : "C" );
       settingsFile.println("LogFile=" + String(logFileNumber));
       settingsFile.println("Reading=" + String(readingNumber));
