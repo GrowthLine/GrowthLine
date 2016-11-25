@@ -208,6 +208,7 @@ void loop() {
         readings.pop();
         Serial.println("popped successfuly");
       }
+      saveSettings(logFileNumber,readingNumber,saveEnable,fahrenheit);
       Serial.println("Entering READY_STATE");
       break;
     case MENU_STATE:
@@ -253,6 +254,7 @@ void loop() {
           } else {
             fahrenheit = true;
           }
+          saveSettings(logFileNumber,readingNumber,saveEnable,fahrenheit);
           tempChange = true;
           break;
         case BTN_NW:
@@ -267,6 +269,7 @@ void loop() {
           if (saveEnable) {
             checkLogExists(++logFileNumber);
             readingNumber = 1;
+            saveSettings(logFileNumber,readingNumber,saveEnable,fahrenheit);
             deviceState = READY_STATE;
             redraw = true;
             statusBar = "NewLogFile";

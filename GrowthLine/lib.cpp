@@ -60,8 +60,9 @@ void getLogs(String fileName, String logs[], unsigned int *logNumber ) {
   *logNumber += index;
 }
 
+
 //Overwrite "settings.txt" when changes are made
-void newSettings (unsigned int logFileNumber, unsigned int readingNumber, bool saveEnable, bool fahrenheit){
+void saveSettings (unsigned int logFileNumber, unsigned int readingNumber, bool saveEnable, bool fahrenheit){
   if (saveEnable){
       SD.remove("settings.txt");
       File settingsFile = SD.open("settings.txt", FILE_WRITE);
