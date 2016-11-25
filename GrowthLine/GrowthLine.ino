@@ -64,15 +64,13 @@ void setup() {
     while (settingsFile.read() != '=');               // find the first = sign, which indicates temp. unit
     if (settingsFile.read() == 'F')
       fahrenheit = true;
-    while (settingsFile.read() == '=') {
-      while (settingsFile.peek() != '\n') {
-        logNumberBuffer += settingsFile.read();
-      }
+    while (settingsFile.read() == '=');
+    while (settingsFile.peek() != '\n') {
+      logNumberBuffer += settingsFile.read();
     }
-    while (settingsFile.read() == '=') {
-      while (settingsFile.peek() != '\n') {
-        lineReadBuffer += settingsFile.read();
-      }
+    while (settingsFile.read() != '=');
+    while (settingsFile.peek() != '\n') {
+      lineReadBuffer += settingsFile.read();
     }
     if (logNumberBuffer.toInt() != 0) {
       logFileNumber = logNumberBuffer.toInt();
