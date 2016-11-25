@@ -17,7 +17,6 @@ Adafruit_STMPE610 *ts;                          // pointer to a touch screen obj
 Adafruit_ILI9341 *tft;                          // pointer to a display object
 int tempReadingNumber;
 
-
 void setup() {
   Serial.println("Software Initializing");
   Serial.begin(9600);
@@ -41,7 +40,7 @@ void setup() {
   /* Create our display and touch objects */
   tft = new Adafruit_ILI9341(TFT_CS, TFT_DC);
   ts = new Adafruit_STMPE610(STMPE_CS);
-
+ 
   /* Setup the sensors */
   sensors.setupSensors();
 
@@ -61,16 +60,16 @@ void setup() {
       settingsFile.close();
     }
     File settingsFile = SD.open("settings.txt");
-    while (settingsFile.read() != '=');               // find the first = sign, which indicates temp. unit
-    if (settingsFile.read() == 'F')
+    while ((char)settingsFile.read() != '=');               // find the first = sign, which indicates temp. unit
+    if ((char)settingsFile.read() == 'F')
       fahrenheit = true;
-    while (settingsFile.read() == '=');
-    while (settingsFile.peek() != '\n') {
-      logNumberBuffer += settingsFile.read();
+    while ((char)settingsFile.read() != '=');
+    while ((char)settingsFile.peek() != '\n') {
+      logNumberBuffer += (char)settingsFile.read();
     }
-    while (settingsFile.read() != '=');
-    while (settingsFile.peek() != '\n') {
-      lineReadBuffer += settingsFile.read();
+    while ((char)settingsFile.read() != '=');
+    while ((char)settingsFile.peek() != '\n') {
+      lineReadBuffer += (char)settingsFile.read();
     }
     if (logNumberBuffer.toInt() != 0) {
       logFileNumber = logNumberBuffer.toInt();
@@ -80,7 +79,6 @@ void setup() {
     }
     if (lineReadBuffer.toInt() != 0) {
       readingNumber = lineReadBuffer.toInt();
-      tempReadingNumber = readingNumber;
     }
     else {
       readingNumber = 1;
@@ -107,7 +105,6 @@ void setup() {
    flickering.
 */
 void loop() {
-  Serial.println("Reading Number: " + String(tempReadingNumber));
   // Determine if the screen was touched and on which quadrant
   TS_Point touchedPoint;
   uint8_t touchedQuadrant = BTN_NONE;
