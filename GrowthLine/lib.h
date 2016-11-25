@@ -183,4 +183,8 @@ float cToF(float c);
 bool stableReadings(QueueList<Reading> *readings);
 uint8_t phStatus(float);
 uint8_t groundTempStatus(float);
+void newSettings (unsigned int logFileNumber, unsigned int readingNumber, bool saveEnable, bool fahrenheit);
+void saveLog(unsigned int logFileNumber, unsigned int readingNumber, QueueList<Reading> readings, bool fahrenheit);
+void checkLogExists(unsigned int logFileNumber);
+
 
