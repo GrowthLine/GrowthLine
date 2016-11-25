@@ -18,7 +18,7 @@ Adafruit_ILI9341 *tft;                          // pointer to a display object
 
 
 void setup() {
-  Serial.println("Software Initialized");
+  Serial.println("Software Initializing");
   Serial.begin(9600);
   readings.setPrinter(Serial);
   deviceState   = READY_STATE;
@@ -52,8 +52,8 @@ void setup() {
   else {
     // If the settings file is missing, make it with the defaults
     if ( !SD.exists("settings.txt")) {
-      Serial.println("SD file exists");
-      File settingsFile = SD.open("settings.txt");
+      Serial.println("Making Settings File");
+      File settingsFile = SD.open("settings.txt", FILE_WRITE);
       settingsFile.println("TempUnit=C");
       settingsFile.println("LogFile=1");
       settingsFile.println("Reading=1");
@@ -87,6 +87,7 @@ void setup() {
         readingNumber = 1;
       }
       settingsFile.close();
+      checkLogExists(logFileNumber);
     }
 
   }
@@ -122,6 +123,7 @@ void loop() {
   switch (deviceState) {
     case READY_STATE:
       if (redraw) {
+        Serial.println("device is ready");
         draw_MainMenu();
         redraw = false;
       }
@@ -174,14 +176,18 @@ void loop() {
           deviceState = READY_STATE;
           redraw = true;
           statusBar = "GrowthLine";
-          while (!readings.isEmpty()) // Clear the readings list
+          while (!readings.isEmpty()) { // Clear the readings list
             readings.pop();
+            Serial.println("Emptying list");
+          }
           break;
       }
       if ( millis() - milliseconds > READING_FREQUENCY) {   // updates displayed reading
         update_Readings();
-        if (readings.count() == NUMBER_OF_READINGS)
+        if (readings.count() == NUMBER_OF_READINGS){
           readings.pop();
+          Serial.println("Popped a reading");
+        }
         readings.push( sensors.getReading() );
         milliseconds = millis();
       }
@@ -191,12 +197,18 @@ void loop() {
         draw_SaveScreen();
         redraw = false;
       }
-      saveLog(logFileNumber, readingNumber, readings, fahrenheit);
+      Serial.println("Saving log file");
+      saveLog(logFileNumber, &readingNumber, &readings, fahrenheit);
+      Serial.println("Log saved");
       deviceState = READY_STATE;
       redraw = true;
       statusBar = "Read Saved";
-      while (!readings.isEmpty())
+      while (!readings.isEmpty()) {
+        Serial.println("Hi");
         readings.pop();
+        Serial.println("popped successfuly");
+      }
+      Serial.println("Entering READY_STATE");
       break;
     case MENU_STATE:
       if (redraw) {
@@ -354,7 +366,7 @@ void draw_SaveScreen() {
 
   /* Set text attributes and draw text. */
   tft->setTextSize(3);
-  tft->setCursor( 62, 100);
+  tft->setCursor( 82, 100);
   tft->setTextColor( ILI9341_WHITE, ILI9341_BLACK);
   tft->println("Saving");
 }
@@ -365,7 +377,7 @@ void draw_ShutdownScreen() {
 
   /* Set text attributes and draw text. */
   tft->setTextSize(3);
-  tft->setCursor( 45, 100);
+  tft->setCursor( 30, 100);
   tft->setTextColor( ILI9341_WHITE, ILI9341_BLACK);
   tft->println("Safe to Shutdown");
 }

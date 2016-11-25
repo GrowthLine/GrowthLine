@@ -185,6 +185,6 @@ uint8_t phStatus(float);
 uint8_t groundTempStatus(float);
 void getLogs(String fileName, String logs[],  unsigned int *logNumber );
 void newSettings (unsigned int logFileNumber, unsigned int readingNumber, bool saveEnable, bool fahrenheit);
-void saveLog(unsigned int logFileNumber, unsigned int readingNumber, QueueList<Reading> readings, bool fahrenheit);
+void saveLog(unsigned int logFileNumber, unsigned int *readingNumber, QueueList<Reading> *readings, bool fahrenheit);
 void checkLogExists(unsigned int logFileNumber);
 

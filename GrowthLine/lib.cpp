@@ -64,7 +64,7 @@ void getLogs(String fileName, String logs[], unsigned int *logNumber ) {
 void newSettings (unsigned int logFileNumber, unsigned int readingNumber, bool saveEnable, bool fahrenheit){
   if (saveEnable){
       SD.remove("settings.txt");
-      File settingsFile = SD.open("settings.txt");
+      File settingsFile = SD.open("settings.txt", FILE_WRITE);
       settingsFile.println("TempUnit=" + fahrenheit? "F" : "C" );
       settingsFile.println("LogFile=" + String(logFileNumber));
       settingsFile.println("Reading=" + String(readingNumber));
@@ -73,12 +73,13 @@ void newSettings (unsigned int logFileNumber, unsigned int readingNumber, bool s
 }
 
 //Save log to SD card
-void saveLog(unsigned int logFileNumber, unsigned int readingNumber, QueueList<Reading> readings, bool fahrenheit){
+void saveLog(unsigned int logFileNumber, unsigned int *readingNumber, QueueList<Reading> *readings, bool fahrenheit){
   String logFileName = "log" + String(logFileNumber) + ".txt";
   if (SD.exists(logFileName)) {
     File logFile = SD.open(logFileName, FILE_WRITE);
-    logFile.println(String(readingNumber) + "," + readings.peek().toString(fahrenheit));
+    logFile.println(String(*readingNumber) + "," + readings->peek().toString(fahrenheit));
     logFile.close();
+    *readingNumber += 1;
   }
   else {
     Serial.println("Log File Not Found!");
@@ -93,6 +94,7 @@ void checkLogExists(unsigned int logFileNumber){
     File logFile = SD.open(logFileName, FILE_WRITE);
     logFile.println(fileHeader);
     logFile.close();
+    Serial.println("New log file created " + logFileName);
   }
   else {
     Serial.println("Log File Found!");
