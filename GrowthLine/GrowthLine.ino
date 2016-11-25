@@ -18,6 +18,7 @@ Adafruit_ILI9341 *tft;                          // pointer to a display object
 
 
 void setup() {
+  Serial.println("Software Initialized");
   Serial.begin(9600);
   readings.setPrinter(Serial);
   deviceState   = READY_STATE;
@@ -44,13 +45,14 @@ void setup() {
   sensors.setupSensors();
 
   /* Setting up the SD card */
-  // If the settings file is missing, make it with the defaults
   if (! SD.begin(SD_CS_PIN)) {
     Serial.println("SD card initialization failed!");
     saveEnable = false;
   }
   else {
+    // If the settings file is missing, make it with the defaults
     if ( !SD.exists("settings.txt")) {
+      Serial.println("SD file exists");
       File settingsFile = SD.open("settings.txt");
       settingsFile.println("TempUnit=C");
       settingsFile.println("LogFile=1");
@@ -277,89 +279,22 @@ void loop() {
       break;
     case LOG_STATE:
       if (redraw) {
-        String fileName = "log";
-        File logFile = SD.open(fileName + logFileNumber + ".txt");
         String logs[5] = {"", "", "", "", ""};
-        String currentLog = "";
-        uint8_t counter = 0;
-        Serial.println("Entering Loop");
-        bool use = true;
-        uint8_t commaCount = 0;
-        while ( logFile.available() ) {
-          if ( counter == 5 )
-            break;
-          char current = logFile.read();
-          if ( current == '\n') {
-            counter += 1;
-            commaCount = 0;
-            use = true;
-            continue;
-          }
-          if ( current == '.' && commaCount != 3) {
-            use = false;
-            continue;
-          }
-          else if ( current == ',') {
-            commaCount += 1;
-            use = true;
-          }
-          if ( use )
-            logs[counter] += current;
-        }
-        logFile.close();
-        Serial.println("Closing file and drawing");
+        getLogs(String("log") + logFileNumber + ".txt", logs, &currentRead);
         draw_LogScreen(logs);
-        Serial.println("Drawing complete");
-        currentRead = counter;
         redraw = false;
       }
       if ( touchedQuadrant == BTN_NW) {
         deviceState = MENU_STATE;
-        currentRead = 0;
+        currentRead = 1;
         redraw = true;
       }
       else if ( touchedQuadrant == BTN_NE) {
-        Serial.println("Printing the next logs");
-        String fileName = "log";
         String logs[5] = {"", "", "", "", ""};
-        File logFile = SD.open(fileName + logFileNumber + ".txt");
-        String currentLog = "";
-        uint8_t logCounter = 0;
-        while (logCounter != currentRead && logFile.available() ) {
-          if (logFile.read() == '\n')
-            logCounter += 1 ;
-        }
-        uint8_t counter = 0;
-        Serial.println("Entering Loop");
-        bool use = true;
-        uint8_t commaCount = 0;
-        while ( logFile.available() ) {
-          if ( counter == 5 )
-            break;
-          char current = logFile.read();
-          Serial.print(current);
-          if ( current == '\n') {
-            counter += 1;
-            commaCount = 0;
-            use = true;
-            continue;
-          }
-          if ( current == '.' && commaCount != 3) {
-            use = false;
-            continue;
-          }
-          else if ( current == ',') {
-            commaCount += 1;
-            use = true;
-          }
-          if ( use )
-            logs[counter] += current;
-        }
-        logFile.close();
-        Serial.println("updating logs");
+        getLogs(String("log") + logFileNumber + ".txt", logs, &currentRead);
         update_Logs(logs);
-        Serial.println("Logs Done");
-        currentRead += counter;
+        if(currentRead >= readingNumber)
+          currentRead = 1;
       }
       break;
     case SHUTDOWN_STATE:      // ******** Need to do this one ******* ///
@@ -667,7 +602,7 @@ void draw_LogScreen(String in_array[]) {
 
 void update_Logs(String in_array[]) {
   /* Blank out logs */
-  tft->fillRect(20, 142, 280, 100, ILI9341_BLACK);
+  tft->fillRect(10, 142, 300, 100, ILI9341_BLACK);
 
   /* Output lines */
   tft->setTextSize(2);
@@ -675,7 +610,6 @@ void update_Logs(String in_array[]) {
   for (int i = 0; i < 5; i++) {
     tft->setCursor( 20, 142 + (i * 20));
     tft->println(in_array[i]);
-    Serial.println(in_array[i]);
   }
 }
 

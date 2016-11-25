@@ -183,4 +183,5 @@ float cToF(float c);
 bool stableReadings(QueueList<Reading> *readings);
 uint8_t phStatus(float);
 uint8_t groundTempStatus(float);
+void getLogs(String fileName, String logs[],  unsigned int *logNumber );
 

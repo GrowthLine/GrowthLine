@@ -18,6 +18,46 @@ uint8_t getQuadrantFromPoint(TS_Point *p) {
   return BTN_NONE;
 }
 
+void getLogs(String fileName, String logs[], unsigned int *logNumber ) {
+  File logFile = SD.open(fileName);
+  /* Read data already displayed in the log scereen */
+  uint8_t logCounter = 0;
+  while (logCounter != *logNumber && logFile.available() ) {
+    if (logFile.read() == '\n')
+      logCounter += 1 ;
+  }
+  
+  if(!logFile.available())                              // if the file has been fully read, just exit
+    return;
+    
+  uint8_t index = 0;                                  // current array index
+  bool use = true;                                    // used to tell whether we save character or not
+  uint8_t commaCount = 0;                             // used to tell when we arrive to pH field
+  while ( logFile.available() ) {
+    if ( index == 5 )                                 // once we have 5 logs, exit
+      break;
+    char current = logFile.read();
+    if ( current == '\n') {                           // we finished reading one record
+      index += 1;
+      commaCount = 0;
+      use = true;
+      continue;
+    }
+    if ( current == '.' && commaCount != 3) {         // truncate fractinoal part, except for pH
+      use = false;
+      continue;
+    }
+    else if ( current == ',') {                       // start saving characters again, for next fields
+      commaCount += 1;
+      use = true;
+    }
+    if ( use )                                        // concatinate the current character to the current log
+      logs[index] += current;
+  }
+  logFile.close();
+  *logNumber += index;
+}
+
 uint8_t phStatus(float ph) {
   if ( ph < GOOD_LOW_PH && ph > 0 )
     return BAD_LOW;
