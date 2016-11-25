@@ -49,7 +49,7 @@ void setup() {
     Serial.println("SD card initialization failed!");
     saveEnable = false;
   }
-  else{
+  else {
     if ( !SD.exists("settings.txt")) {
       File settingsFile = SD.open("settings.txt");
       settingsFile.println("TempUnit=C");
@@ -62,31 +62,31 @@ void setup() {
       while (settingsFile.read() != '=');               // find the first = sign, which indicates temp. unit
       if (settingsFile.read() == 'F')
         fahrenheit = true;
-      while(settingsFile.read() == '='){
-        while(settingsFile.peek() !='\n'){
+      while (settingsFile.read() == '=') {
+        while (settingsFile.peek() != '\n') {
           logNumberBuffer += settingsFile.read();
         }
       }
-      while(settingsFile.read() == '='){
-        while(settingsFile.peek() !='\n'){
+      while (settingsFile.read() == '=') {
+        while (settingsFile.peek() != '\n') {
           lineReadBuffer += settingsFile.read();
         }
       }
-      if(logNumberBuffer.toInt() != 0){
+      if (logNumberBuffer.toInt() != 0) {
         logFileNumber = logNumberBuffer.toInt();
       }
-      else{
+      else {
         logFileNumber = 1;
       }
-      if(lineReadBuffer.toInt() != 0){
+      if (lineReadBuffer.toInt() != 0) {
         readingNumber = lineReadBuffer.toInt();
       }
-      else{
+      else {
         readingNumber = 1;
       }
-      
+
     }
-    
+
   }
   /* check that touch screen is started propperly */
   while (true) {
@@ -250,9 +250,11 @@ void loop() {
           redraw = true;
           break;
         case BTN_SE:
-          deviceState = READY_STATE;
-          redraw = true;
-          statusBar = "NewLogFile";
+          if (saveEnable) {
+            deviceState = READY_STATE;
+            redraw = true;
+            statusBar = "NewLogFile";
+          }
           break;
       }
       break;
@@ -283,26 +285,26 @@ void loop() {
         Serial.println("Entering Loop");
         bool use = true;
         uint8_t commaCount = 0;
-        while( logFile.available() ) {
-          if( counter == 5 )
+        while ( logFile.available() ) {
+          if ( counter == 5 )
             break;
           char current = logFile.read();
-          if( current == '\n') {
+          if ( current == '\n') {
             counter += 1;
             commaCount = 0;
             use = true;
             continue;
           }
-          if( current == '.' && commaCount != 3) {
+          if ( current == '.' && commaCount != 3) {
             use = false;
             continue;
           }
-          else if( current == ',') {
+          else if ( current == ',') {
             commaCount += 1;
             use = true;
           }
-          if( use )
-            logs[counter] += current;  
+          if ( use )
+            logs[counter] += current;
         }
         logFile.close();
         Serial.println("Closing file and drawing");
@@ -323,35 +325,35 @@ void loop() {
         File logFile = SD.open(fileName + logFileNumber + ".txt");
         String currentLog = "";
         uint8_t logCounter = 0;
-        while(logCounter != currentRead && logFile.available() ) {
-          if(logFile.read() == '\n')
-            logCounter +=1 ;
+        while (logCounter != currentRead && logFile.available() ) {
+          if (logFile.read() == '\n')
+            logCounter += 1 ;
         }
         uint8_t counter = 0;
         Serial.println("Entering Loop");
         bool use = true;
         uint8_t commaCount = 0;
-        while( logFile.available() ) {
-          if( counter == 5 )
+        while ( logFile.available() ) {
+          if ( counter == 5 )
             break;
           char current = logFile.read();
           Serial.print(current);
-          if( current == '\n') {
+          if ( current == '\n') {
             counter += 1;
             commaCount = 0;
             use = true;
             continue;
           }
-          if( current == '.' && commaCount != 3) {
+          if ( current == '.' && commaCount != 3) {
             use = false;
             continue;
           }
-          else if( current == ',') {
+          else if ( current == ',') {
             commaCount += 1;
             use = true;
           }
-          if( use )
-            logs[counter] += current;  
+          if ( use )
+            logs[counter] += current;
         }
         logFile.close();
         Serial.println("updating logs");
@@ -655,7 +657,7 @@ void draw_LogScreen(String in_array[]) {
   tft->setTextColor( ILI9341_WHITE, ILI9341_BLACK);
   tft->setCursor( 20, 122);
   tft->println("# gT Moi pH aT Hum Lux");
-  
+
   /* Output lines */
   for (int i = 0; i < 5; i++) {
     tft->setCursor( 20, 142 + (i * 20));
@@ -678,39 +680,39 @@ void update_Logs(String in_array[]) {
 }
 
 //Overwrite "settings.txt" when changes are made
-void newSettings (){
-  if (saveEnable){
-      SD.remove("settings.txt");
-      File settingsFile = SD.open("settings.txt");
-      settingsFile.println("TempUnit=" + fahrenheit? "F" : "C" );
-      settingsFile.println("LogFile=" + String(logFileNumber));
-      settingsFile.println("Reading=" + String(readingNumber));
-      settingsFile.close();
+void newSettings () {
+  if (saveEnable) {
+    SD.remove("settings.txt");
+    File settingsFile = SD.open("settings.txt");
+    settingsFile.println("TempUnit=" + fahrenheit ? "F" : "C" );
+    settingsFile.println("LogFile=" + String(logFileNumber));
+    settingsFile.println("Reading=" + String(readingNumber));
+    settingsFile.close();
   }
 }
 
 //Save log to SD card
-void saveLog(){
+void saveLog() {
   String logFileName = "log" + String(logFileNumber) + ".txt";
-  if(SD.exists(logFileName)){
+  if (SD.exists(logFileName)) {
     File logFile = SD.open(logFileName, FILE_WRITE);
-    logFile.println(String(readingNumber)+ "," + readings.peek().toString(fahrenheit));
+    logFile.println(String(readingNumber) + "," + readings.peek().toString(fahrenheit));
     logFile.close();
   }
-  else{
+  else {
     Serial.println("Log File Not Found!");
   }
 }
 
-void checkLogExists(){
+void checkLogExists() {
   String logFileName = "log" + String(logFileNumber) + ".txt";
   String fileHeader = "Reading Number,Soil Temperature,Soil Moisture,Soil pH,Air Temperature,Air Humidity,Lux";
-  if(!SD.exists(logFileName)){
+  if (!SD.exists(logFileName)) {
     File logFile = SD.open(logFileName, FILE_WRITE);
     logFile.println(fileHeader);
     logFile.close();
   }
-  else{
+  else {
     Serial.println("Log File Found!");
   }
 }
