@@ -27,12 +27,8 @@ void setup() {
   tempChange    = true;
   currentRead   = 1;
   statusBar     = "GrowthLine";
-<<<<<<< HEAD
-  logFileNumber = 1;
-=======
   String logNumberBuffer = "";                     // holds the settings from the buffer
   String lineReadBuffer = "";
->>>>>>> origin/master
 
   /* Add the sensors to our Sensors object */
   sensors.addSensor(new LightSensor());
@@ -48,8 +44,6 @@ void setup() {
   sensors.setupSensors();
 
   /* Setting up the SD card */
-  /* Setting up the SD card */
-
   // If the settings file is missing, make it with the defaults
   if (! SD.begin(SD_CS_PIN)) {
     Serial.println("SD card initialization failed!");
@@ -282,7 +276,7 @@ void loop() {
     case LOG_STATE:
       if (redraw) {
         String fileName = "log";
-        File logFile = SD.open("log1.txt");
+        File logFile = SD.open(fileName + logFileNumber + ".txt");
         String logs[5] = {"", "", "", "", ""};
         String currentLog = "";
         uint8_t counter = 0;
@@ -700,7 +694,7 @@ void saveLog(){
   String logFileName = "log" + String(logFileNumber) + ".txt";
   if(SD.exists(logFileName)){
     File logFile = SD.open(logFileName, FILE_WRITE);
-    logFile.println(String(readingNumber)+ "," + readings.peek().toString());
+    logFile.println(String(readingNumber)+ "," + readings.peek().toString(fahrenheit));
     logFile.close();
   }
   else{
