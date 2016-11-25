@@ -27,8 +27,10 @@ void getLogs(String fileName, String logs[], unsigned int *logNumber ) {
       logCounter += 1 ;
   }
   
-  if(!logFile.available())                              // if the file has been fully read, just exit
+  if(!logFile.available()) {                             // if the file has been fully read, just exit
+    logFile.close();
     return;
+  }
     
   uint8_t index = 0;                                  // current array index
   bool use = true;                                    // used to tell whether we save character or not
@@ -56,6 +58,45 @@ void getLogs(String fileName, String logs[], unsigned int *logNumber ) {
   }
   logFile.close();
   *logNumber += index;
+}
+
+//Overwrite "settings.txt" when changes are made
+void newSettings (unsigned int logFileNumber, unsigned int readingNumber, bool saveEnable, bool fahrenheit){
+  if (saveEnable){
+      SD.remove("settings.txt");
+      File settingsFile = SD.open("settings.txt");
+      settingsFile.println("TempUnit=" + fahrenheit? "F" : "C" );
+      settingsFile.println("LogFile=" + String(logFileNumber));
+      settingsFile.println("Reading=" + String(readingNumber));
+      settingsFile.close();
+  }
+}
+
+//Save log to SD card
+void saveLog(unsigned int logFileNumber, unsigned int readingNumber, QueueList<Reading> readings, bool fahrenheit){
+  String logFileName = "log" + String(logFileNumber) + ".txt";
+  if (SD.exists(logFileName)) {
+    File logFile = SD.open(logFileName, FILE_WRITE);
+    logFile.println(String(readingNumber) + "," + readings.peek().toString(fahrenheit));
+    logFile.close();
+  }
+  else {
+    Serial.println("Log File Not Found!");
+  }
+}
+
+//Check if log file exists and create it if it does not.
+void checkLogExists(unsigned int logFileNumber){
+  String logFileName = "log" + String(logFileNumber) + ".txt";
+  String fileHeader = "Reading Number,Soil Temperature,Soil Moisture,Soil pH,Air Temperature,Air Humidity,Lux";
+  if (!SD.exists(logFileName)) {
+    File logFile = SD.open(logFileName, FILE_WRITE);
+    logFile.println(fileHeader);
+    logFile.close();
+  }
+  else {
+    Serial.println("Log File Found!");
+  }
 }
 
 uint8_t phStatus(float ph) {
@@ -299,45 +340,6 @@ Sensor* Sensors::getSensor(uint8_t id) {
       sensors.push(sensor);
   }
   return NULL;
-}
-
-//Overwrite "settings.txt" when changes are made
-void newSettings (unsigned int logFileNumber, unsigned int readingNumber, bool saveEnable, bool fahrenheit){
-  if (saveEnable){
-      SD.remove("settings.txt");
-      File settingsFile = SD.open("settings.txt", FILE_WRITE);
-      settingsFile.println("TempUnit=" + fahrenheit? "F" : "C" );
-      settingsFile.println("LogFile=" + String(logFileNumber));
-      settingsFile.println("Reading=" + String(readingNumber));
-      settingsFile.close();
-  }
-}
-
-//Save log to SD card
-void saveLog(unsigned int logFileNumber, unsigned int readingNumber, QueueList<Reading> readings, bool fahrenheit){
-  String logFileName = "log" + String(logFileNumber) + ".txt";
-  if (SD.exists(logFileName)) {
-    File logFile = SD.open(logFileName, FILE_WRITE);
-    logFile.println(String(readingNumber) + "," + readings.peek().toString(fahrenheit));
-    logFile.close();
-  }
-  else {
-    Serial.println("Log File Not Found!");
-  }
-}
-
-//Check if log file exists and create it if it does not.
-void checkLogExists(unsigned int logFileNumber){
-  String logFileName = "log" + String(logFileNumber) + ".txt";
-  String fileHeader = "Reading Number,Soil Temperature,Soil Moisture,Soil pH,Air Temperature,Air Humidity,Lux";
-  if (!SD.exists(logFileName)) {
-    File logFile = SD.open(logFileName, FILE_WRITE);
-    logFile.println(fileHeader);
-    logFile.close();
-  }
-  else {
-    Serial.println("Log File Found!");
-  }
 }
 
 

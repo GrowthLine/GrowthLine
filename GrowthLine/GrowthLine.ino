@@ -86,7 +86,7 @@ void setup() {
       else {
         readingNumber = 1;
       }
-
+      settingsFile.close();
     }
 
   }
@@ -191,7 +191,7 @@ void loop() {
         draw_SaveScreen();
         redraw = false;
       }
-      // ******** Save to SD card code here ******
+      saveLog(logFileNumber, readingNumber, readings, fahrenheit);
       deviceState = READY_STATE;
       redraw = true;
       statusBar = "Read Saved";
@@ -253,6 +253,8 @@ void loop() {
           break;
         case BTN_SE:
           if (saveEnable) {
+            checkLogExists(++logFileNumber);
+            readingNumber = 1;
             deviceState = READY_STATE;
             redraw = true;
             statusBar = "NewLogFile";
@@ -363,9 +365,9 @@ void draw_ShutdownScreen() {
 
   /* Set text attributes and draw text. */
   tft->setTextSize(3);
-  tft->setCursor( 60, 100);
+  tft->setCursor( 45, 100);
   tft->setTextColor( ILI9341_WHITE, ILI9341_BLACK);
-  tft->println("Shutting Down");
+  tft->println("Safe to Shutdown");
 }
 
 void draw_ReadScreen() {
