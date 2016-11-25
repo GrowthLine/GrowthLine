@@ -15,6 +15,7 @@ unsigned int currentRead;                       // holds a value of the latest r
 String statusBar;                               // holds the message displayed on the status bar
 Adafruit_STMPE610 *ts;                          // pointer to a touch screen object
 Adafruit_ILI9341 *tft;                          // pointer to a display object
+int tempReadingNumber;
 
 
 void setup() {
@@ -81,6 +82,7 @@ void setup() {
     }
     if (lineReadBuffer.toInt() != 0) {
       readingNumber = lineReadBuffer.toInt();
+      tempReadingNumber = readingNumber;
     }
     else {
       readingNumber = 1;
@@ -107,6 +109,7 @@ void setup() {
    flickering.
 */
 void loop() {
+  Serial.println("Reading Number: " + String(tempReadingNumber));
   // Determine if the screen was touched and on which quadrant
   TS_Point touchedPoint;
   uint8_t touchedQuadrant = BTN_NONE;
