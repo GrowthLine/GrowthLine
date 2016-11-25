@@ -59,37 +59,34 @@ void setup() {
       settingsFile.println("Reading=1");
       settingsFile.close();
     }
-    else {
-      File settingsFile = SD.open("settings.txt");
-      while (settingsFile.read() != '=');               // find the first = sign, which indicates temp. unit
-      if (settingsFile.read() == 'F')
-        fahrenheit = true;
-      while (settingsFile.read() == '=') {
-        while (settingsFile.peek() != '\n') {
-          logNumberBuffer += settingsFile.read();
-        }
+    File settingsFile = SD.open("settings.txt");
+    while (settingsFile.read() != '=');               // find the first = sign, which indicates temp. unit
+    if (settingsFile.read() == 'F')
+      fahrenheit = true;
+    while (settingsFile.read() == '=') {
+      while (settingsFile.peek() != '\n') {
+        logNumberBuffer += settingsFile.read();
       }
-      while (settingsFile.read() == '=') {
-        while (settingsFile.peek() != '\n') {
-          lineReadBuffer += settingsFile.read();
-        }
-      }
-      if (logNumberBuffer.toInt() != 0) {
-        logFileNumber = logNumberBuffer.toInt();
-      }
-      else {
-        logFileNumber = 1;
-      }
-      if (lineReadBuffer.toInt() != 0) {
-        readingNumber = lineReadBuffer.toInt();
-      }
-      else {
-        readingNumber = 1;
-      }
-      settingsFile.close();
-      checkLogExists(logFileNumber);
     }
-
+    while (settingsFile.read() == '=') {
+      while (settingsFile.peek() != '\n') {
+        lineReadBuffer += settingsFile.read();
+      }
+    }
+    if (logNumberBuffer.toInt() != 0) {
+      logFileNumber = logNumberBuffer.toInt();
+    }
+    else {
+      logFileNumber = 1;
+    }
+    if (lineReadBuffer.toInt() != 0) {
+      readingNumber = lineReadBuffer.toInt();
+    }
+    else {
+      readingNumber = 1;
+    }
+    settingsFile.close();
+    checkLogExists(logFileNumber);
   }
   /* check that touch screen is started propperly */
   while (true) {
@@ -183,13 +180,13 @@ void loop() {
           break;
       }
       if ( millis() - milliseconds > READING_FREQUENCY) {   // updates displayed reading
-        update_Readings();
-        if (readings.count() == NUMBER_OF_READINGS){
+        if (readings.count() == NUMBER_OF_READINGS) {
           readings.pop();
           Serial.println("Popped a reading");
         }
         readings.push( sensors.getReading() );
         milliseconds = millis();
+        update_Readings();
       }
       break;
     case SAVE_STATE:
@@ -208,7 +205,7 @@ void loop() {
         readings.pop();
         Serial.println("popped successfuly");
       }
-      saveSettings(logFileNumber,readingNumber,saveEnable,fahrenheit);
+      saveSettings(logFileNumber, readingNumber, saveEnable, fahrenheit);
       Serial.println("Entering READY_STATE");
       break;
     case MENU_STATE:
@@ -254,7 +251,7 @@ void loop() {
           } else {
             fahrenheit = true;
           }
-          saveSettings(logFileNumber,readingNumber,saveEnable,fahrenheit);
+          saveSettings(logFileNumber, readingNumber, saveEnable, fahrenheit);
           tempChange = true;
           break;
         case BTN_NW:
@@ -269,7 +266,7 @@ void loop() {
           if (saveEnable) {
             checkLogExists(++logFileNumber);
             readingNumber = 1;
-            saveSettings(logFileNumber,readingNumber,saveEnable,fahrenheit);
+            saveSettings(logFileNumber, readingNumber, saveEnable, fahrenheit);
             deviceState = READY_STATE;
             redraw = true;
             statusBar = "NewLogFile";
@@ -310,7 +307,7 @@ void loop() {
         String logs[5] = {"", "", "", "", ""};
         getLogs(String("log") + logFileNumber + ".txt", logs, &currentRead);
         update_Logs(logs);
-        if(currentRead >= readingNumber)
+        if (currentRead >= readingNumber)
           currentRead = 1;
       }
       break;
@@ -474,9 +471,9 @@ void update_Readings() {
   String ground_temp = "Gnd. Temp: ";
   tft->setCursor( 20, 212);
   if (fahrenheit) {
-    tft->println(air_temp + cToF(readings.peek().groundTemperature) + "F");
+    tft->println(ground_temp + cToF(readings.peek().groundTemperature) + "F");
   } else {
-    tft->println(air_temp + readings.peek().groundTemperature + "C");
+    tft->println(ground_temp + readings.peek().groundTemperature + "C");
   }
 }
 
