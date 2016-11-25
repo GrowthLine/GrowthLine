@@ -70,6 +70,10 @@ void saveSettings (unsigned int logFileNumber, unsigned int readingNumber, bool 
       settingsFile.println("LogFile=" + String(logFileNumber));
       settingsFile.println("Reading=" + String(readingNumber));
       settingsFile.close();
+      Serial.println("Settings Updated!");
+  }
+  else{
+    Serial.println("Settings Not Updated!");
   }
 }
 
