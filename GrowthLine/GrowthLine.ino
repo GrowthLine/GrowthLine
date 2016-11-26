@@ -20,6 +20,10 @@ int tempReadingNumber;
 void setup() {
   Serial.println("Software Initializing");
   Serial.begin(9600);
+  tft = new Adafruit_ILI9341(TFT_CS, TFT_DC);
+  tft->begin();
+  tft->setRotation(1);
+  draw_Startup();
   readings.setPrinter(Serial);
   deviceState   = READY_STATE;
   redraw        = true;
@@ -37,10 +41,9 @@ void setup() {
   sensors.addSensor(new pH(PH_RECEIVE_PIN, PH_TRANSMIT_PIN));
   sensors.addSensor(new TempMoist(TEMP_MOIST_DATA_PIN, TEMP_MOIST_CLOCK_PIN));
 
-  /* Create our display and touch objects */
-  tft = new Adafruit_ILI9341(TFT_CS, TFT_DC);
+  /* Create our touch objects */
   ts = new Adafruit_STMPE610(STMPE_CS);
- 
+
   /* Setup the sensors */
   sensors.setupSensors();
 
@@ -60,15 +63,15 @@ void setup() {
       settingsFile.close();
     }
     File settingsFile = SD.open("settings.txt");
-    while ((char)settingsFile.read() != '=');               // find the first = sign, which indicates temp. unit
-    if ((char)settingsFile.read() == 'F')
+    while (settingsFile.available() && (char)settingsFile.read() != '=');               // find the first = sign, which indicates temp. unit
+    if (settingsFile.available() && (char)settingsFile.read() == 'F')
       fahrenheit = true;
-    while ((char)settingsFile.read() != '=');
-    while ((char)settingsFile.peek() != '\n') {
+    while (settingsFile.available() && (char)settingsFile.read() != '=');
+    while (settingsFile.available() && (char)settingsFile.peek() != '\n') {
       logNumberBuffer += (char)settingsFile.read();
     }
-    while ((char)settingsFile.read() != '=');
-    while ((char)settingsFile.peek() != '\n') {
+    while (settingsFile.available() && (char)settingsFile.read() != '=');
+    while (settingsFile.available() && (char)settingsFile.peek() != '\n') {
       lineReadBuffer += (char)settingsFile.read();
     }
     if (logNumberBuffer.toInt() != 0) {
@@ -94,8 +97,6 @@ void setup() {
       Serial.println("Touchscreen controller start failure!");
     }
   }
-  tft->begin();
-  tft->setRotation(1);
   Serial.println("Setup is complete");
 }
 
@@ -105,6 +106,7 @@ void setup() {
    flickering.
 */
 void loop() {
+  Serial.println("hello");
   // Determine if the screen was touched and on which quadrant
   TS_Point touchedPoint;
   uint8_t touchedQuadrant = BTN_NONE;
@@ -367,6 +369,17 @@ void draw_SaveScreen() {
   tft->setCursor( 82, 100);
   tft->setTextColor( ILI9341_WHITE, ILI9341_BLACK);
   tft->println("Saving");
+}
+
+void draw_Startup() {
+  /* Blank screen */
+  tft->fillScreen(ILI9341_BLACK);
+
+  /* Set text attributes and draw text. */
+  tft->setTextSize(3);
+  tft->setCursor( 30, 100);
+  tft->setTextColor( ILI9341_WHITE, ILI9341_BLACK);
+  tft->println("  Initializing  ");
 }
 
 void draw_ShutdownScreen() {
