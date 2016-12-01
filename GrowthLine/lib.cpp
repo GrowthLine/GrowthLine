@@ -1,26 +1,28 @@
 #include "lib.h"
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~ General Functions ~~~~~~~~~~~~~~~~~~~~~~~ */
-/* Finds the quadrant touched by the user on the screen */
+/* Finds the quadrant touched by the user on the screen, wide screen orientation */
 uint8_t getQuadrantFromPoint(TS_Point *p) {
-  if ( p->x > TS_MAXX / 2 && p->y < TS_MAXY / 2) {
+  if ( p->x > TS_MAXX / 2 && p->y < TS_MAXY / 2) {            // North-West touch
     return BTN_NW;
   }
-  if ( p->x < TS_MAXX / 2 && p->y < TS_MAXY / 2) {
+  if ( p->x < TS_MAXX / 2 && p->y < TS_MAXY / 2) {            // South-West touch
     return BTN_SW;
   }
-  if ( p->x < TS_MAXX / 2 && p->y > TS_MAXY / 2) {
+  if ( p->x < TS_MAXX / 2 && p->y > TS_MAXY / 2) {            // South-East touch
     return BTN_SE;
   }
-  if ( p->x > TS_MAXX / 2 && p->y > TS_MAXY / 2) {
+  if ( p->x > TS_MAXX / 2 && p->y > TS_MAXY / 2) {            // North-East Touch
     return BTN_NE;
   }
   return BTN_NONE;
 }
 
+/* Reads 5 log files starting from the logNumber */
 void getLogs(String fileName, String logs[], unsigned int *logNumber ) {
   File logFile = SD.open(fileName);
-  /* Read data already displayed in the log scereen */
+  
+  // Read data already displayed in the log scereen  
   uint8_t logCounter = 0;
   while (logCounter != *logNumber && logFile.available() ) {
     if (logFile.read() == '\n')
@@ -61,7 +63,7 @@ void getLogs(String fileName, String logs[], unsigned int *logNumber ) {
 }
 
 
-//Overwrite "settings.txt" when changes are made
+/* Overwrite "settings.txt" when changes are made */
 void saveSettings (unsigned int logFileNumber, unsigned int readingNumber, bool saveEnable, bool fahrenheit){
   if (saveEnable){
       SD.remove("settings.txt");
@@ -78,7 +80,7 @@ void saveSettings (unsigned int logFileNumber, unsigned int readingNumber, bool 
   }
 }
 
-//Save log to SD card
+/* Save log to SD card */
 void saveLog(unsigned int logFileNumber, unsigned int *readingNumber, QueueList<Reading> *readings, bool fahrenheit){
   String logFileName = "log" + String(logFileNumber) + ".txt";
   if (SD.exists(logFileName)) {
@@ -92,7 +94,7 @@ void saveLog(unsigned int logFileNumber, unsigned int *readingNumber, QueueList<
   }
 }
 
-//Check if log file exists and create it if it does not.
+/* Check if log file exists and create it if it does not */
 void checkLogExists(unsigned int logFileNumber){
   String logFileName = "log" + String(logFileNumber) + ".txt";
   String fileHeader = "Reading Number,Soil Temperature,Soil Moisture,Soil pH,Air Temperature,Air Humidity,Lux";
@@ -107,6 +109,7 @@ void checkLogExists(unsigned int logFileNumber){
   }
 }
 
+/* Determines pH value classification */ 
 uint8_t phStatus(float ph) {
   if ( ph < GOOD_LOW_PH && ph > 0 )
     return BAD_LOW;
@@ -117,6 +120,8 @@ uint8_t phStatus(float ph) {
   else
     return UNKNOWN;
 }
+
+/* Determines ground temperature value classification */ 
 uint8_t groundTempStatus(float t) {
   if ( t < GOOD_LOW_GROUND_TEMPERATURE && t > 0 )
     return BAD_LOW;

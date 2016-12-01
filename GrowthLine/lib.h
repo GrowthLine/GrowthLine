@@ -3,10 +3,10 @@
 #define NUMBER_OF_READINGS 5                    // Number of readings we will hold before discarding old one
 #define WARMUP_LENGTH 5000                      // length of the warm up in milliseconds
 #define WARMUP_TOLERANCE 0.05                   // Value used to set how how apart should values be from average
-#define GOOD_LOW_PH 5.5
-#define GOOD_HIGH_PH 5.9
-#define GOOD_LOW_GROUND_TEMPERATURE 21.1111
-#define GOOD_HIGH_GROUND_TEMPERATURE 35.0000
+#define GOOD_LOW_PH 5.5                         // Determines lowest "good" pH value for soil
+#define GOOD_HIGH_PH 7.0                        // Determines highest "good" pH value for soil
+#define GOOD_LOW_GROUND_TEMPERATURE 21.1111     // Determines lowest "good" ground temperature value for soil
+#define GOOD_HIGH_GROUND_TEMPERATURE 35.0000    // Determines highest "good" ground temperature value for soil
 
 // Different device states
 #define READY_STATE 0
@@ -62,16 +62,16 @@
 /* Library needed for the Queue List */
 #include <QueueList.h>
 
-/* Library needed for statistica calculations */
+/* Library needed for statistic calculations */
 #include <Statistic.h>
 
-/* Library needed for Touch LCD */
+/* Libraries needed for Touch LCD */
 #include <Adafruit_GFX.h>
 #include <gfxfont.h>
 #include <Adafruit_STMPE610.h>
 #include <Adafruit_ILI9341.h>
 
-/* Libraries needed for SD card */
+/* Library needed for SD card */
 #include <SD.h>
 
 /* Libraries needed for Light Sensor  */
