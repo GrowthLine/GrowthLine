@@ -1,7 +1,7 @@
 files to test the RHT03 ambient temperature and humidity sensor
 Left-to-Right pin configuration: Vdd - Data - Null (no use) - Ground
 
-dht.cpp and dht.h are the files needed by sensor
+DHT.zip holds the library files needed for the sensor.
 
 To read from the sensor, use the read22 function: sensorName.read22(dataPin)
 It returns an integer that corresponds to the status of the sensor (in case it detects errors)
