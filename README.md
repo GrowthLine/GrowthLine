@@ -13,6 +13,3 @@ Andrew Leverkuhn
 Miguel Rosales
 Jose Daniel Velazco
 Daniel Weaver
-
-Any donations, feel free to contact: velazcojd@gmail.com
-For updates on the project: https://github.com/VelazcoJD/GrowthLine
