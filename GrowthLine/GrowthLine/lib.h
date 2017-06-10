@@ -57,10 +57,13 @@
 #define BAD_LOW   0
 #define GOOD      1
 #define BAD_HIGH  2
-#define UNKNOWN   3
+#define NOT_KNOWN   3
 
-/* Library needed for the Queue List */
-#include <QueueList.h>
+/* Libraries needed from the GrowthLine Project Libraries */
+#include <Utilities.h>
+#include <Measurements.h>
+#include <Sensor.h>
+#include <Logger.h>
 
 /* Library needed for statistic calculations */
 #include <Statistic.h>
@@ -70,9 +73,6 @@
 #include <gfxfont.h>
 #include <Adafruit_STMPE610.h>
 #include <Adafruit_ILI9341.h>
-
-/* Library needed for SD card */
-#include <SD.h>
 
 /* Libraries needed for Light Sensor  */
 #include <Adafruit_Sensor.h>
@@ -87,32 +87,8 @@
 /* Library needed for Temperature/Moisture Sensor (SHT10)  */
 #include <SHT1x.h>
 
-/* Reading class. It holds all the values read from the sensors */
-class Reading {
-  public:
-    float lux;
-    float airTemperature;
-    float humidity;
-    float pH;
-    float groundTemperature;
-    float moisture;
-
-    Reading( float, float, float, float, float, float );
-    Reading();
-    String toString(bool);
-};
-
-/* Abstract class, all sensors inherit from this */
-class Sensor {
-  public:
-    Reading *reading;
-    uint8_t ID;
-    Sensor() {}
-    ~Sensor();
-    virtual void read() = 0;
-    virtual void setUp() = 0;
-    virtual void setReading(Reading *r);
-};
+/* SD Library */
+#include <SD.h>
 
 /* Light sensor class */
 class LightSensor : public Sensor {
@@ -121,35 +97,36 @@ class LightSensor : public Sensor {
 
     LightSensor();
     ~LightSensor();
-    void read();
+    List<Read> read();
     void setUp();
-    void setReading(Reading *r);
+    void calibrate();
 };
 
 /* Air Temperature/Humidity Class */
 class TempHumid : public Sensor {
+private:
     uint8_t pin;
     DHT_Unified *DHT;
     uint8_t err;
   public:
-    TempHumid(uint8_t);
+    TempHumid(uint8_t p);
     ~TempHumid();
-    void read();
+    List<Read> read();
     void setUp();
-    void setReading(Reading *r);
+    void calibrate();
 };
 
 /* pH Sensor Class */
 class pH : public Sensor {
+private:
     uint8_t rx;
     uint8_t tx;
     SoftwareSerial *serial;
   public:
-    pH(uint8_t, uint8_t);
+    pH(uint8_t re, uint8_t t);
     ~pH();
-    void read();
+    List<Read> read();
     void setUp();
-    void setReading(Reading *r);
     void calibrate();
 };
 
@@ -159,32 +136,22 @@ class TempMoist : public Sensor {
     uint8_t clockPin;
     SHT1x *sht1x;
   public:
-    TempMoist(uint8_t, uint8_t);
+    TempMoist(uint8_t d, uint8_t c);
     ~TempMoist();
-    void read();
+    List<Read> read();
     void setUp();
-    void setReading(Reading *r);
-};
-
-/* Sensors Class */
-class Sensors {
-    QueueList<Sensor*> sensors;
-  public:
-    Sensors();
-    void addSensor(Sensor *s);
-    void setupSensors();
-    Reading getReading();
-    Sensor* getSensor(uint8_t id);
+    void calibrate();
 };
 
 /* General Functions */
+/* Finds the quadrant touched by the user on the screen, wide screen orientation */
 uint8_t getQuadrantFromPoint(TS_Point *p);
-float cToF(float c);
-bool stableReadings(QueueList<Reading> *readings);
-uint8_t phStatus(float);
-uint8_t groundTempStatus(float);
-void getLogs(String fileName, String logs[],  unsigned int *logNumber );
-void saveSettings (unsigned int logFileNumber, unsigned int readingNumber, bool saveEnable, bool fahrenheit);
-void saveLog(unsigned int logFileNumber, unsigned int *readingNumber, QueueList<Reading> *readings, bool fahrenheit);
-void checkLogExists(unsigned int logFileNumber);
 
+/* analyzse the readings list and see if the readings are stable */
+bool stableReadings(List<Reading>& readings);
+
+/* Determines pH value classification */
+uint8_t phStatus(float ph);
+
+/* Determines ground temperature value classification */
+uint8_t groundTempStatus(float t);

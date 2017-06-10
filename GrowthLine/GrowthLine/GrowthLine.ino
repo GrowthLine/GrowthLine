@@ -1,34 +1,30 @@
 #include "lib.h"
 
 /* Variable Declarations */
-QueueList<Reading> readings;                   // List used to hold reading objects. Structured in a queue.
+List<Reading> readings(5);           // List used to hold reading objects. Structured in a queue.
 Sensors sensors;                                // Object that will hold and manage all other sensors
 int deviceState;                                // State of device
 bool fahrenheit;                                // Saves user information about temperature unit
 bool redraw;                                    // Flag used to know when to redraw a screen
-bool saveEnable;                                // Used to disable the save button (in case SD card is not inserted)
 bool tempChange;                                // Flag used to ID when to redraw Temp buttons
 unsigned long milliseconds;                     // saves milliseconds. Used with millis() to check lenths of time
-unsigned int readingNumber;                     // holds the current value that will be used to write to SD card
-unsigned int logFileNumber;                     // holds the current log file number
 unsigned int currentRead;                       // holds a value of the latest read displayed on the log screen
 String statusBar;                               // holds the message displayed on the status bar
 Adafruit_STMPE610 *ts;                          // pointer to a touch screen object
 Adafruit_ILI9341 *tft;                          // pointer to a display object
 int tempReadingNumber;
+Reading tempReading;
 
 void setup() {
-  Serial.println("Software Initializing");
   Serial.begin(9600);
+  Serial.println("Software Initializing");
   tft = new Adafruit_ILI9341(TFT_CS, TFT_DC);
   tft->begin();
   tft->setRotation(1);
   draw_Startup();
-  readings.setPrinter(Serial);
   deviceState   = READY_STATE;
   redraw        = true;
   fahrenheit    = false;
-  saveEnable    = true;
   tempChange    = true;
   currentRead   = 1;
   statusBar     = "GrowthLine";
@@ -36,10 +32,14 @@ void setup() {
   String lineReadBuffer = "";
 
   /* Add the sensors to our Sensors object */
-  sensors.addSensor(new LightSensor());
-  sensors.addSensor(new TempHumid(TEMP_HUMID_PIN));
-  sensors.addSensor(new pH(PH_RECEIVE_PIN, PH_TRANSMIT_PIN));
-  sensors.addSensor(new TempMoist(TEMP_MOIST_DATA_PIN, TEMP_MOIST_CLOCK_PIN));
+  LightSensor* lightSensor = new LightSensor();
+  sensors.addSensor(lightSensor);
+  TempHumid* tempHumid = new TempHumid(TEMP_HUMID_PIN);
+  sensors.addSensor(tempHumid);
+  pH* ph = new pH(PH_RECEIVE_PIN, PH_TRANSMIT_PIN);
+  sensors.addSensor(ph);
+  TempMoist* tempMoist = new TempMoist(TEMP_MOIST_DATA_PIN, TEMP_MOIST_CLOCK_PIN);
+  sensors.addSensor(tempMoist);
 
   /* Create our touch objects */
   ts = new Adafruit_STMPE610(STMPE_CS);
@@ -50,9 +50,9 @@ void setup() {
   /* Setting up the SD card */
   if (! SD.begin(SD_CS_PIN)) {
     Serial.println("SD card initialization failed!");
-    saveEnable = false;
   }
   else {
+    Logger::saveEnable = false;
     // If the settings file is missing, make it with the defaults
     if ( !SD.exists("settings.txt")) {
       Serial.println("Making Settings File");
@@ -75,19 +75,19 @@ void setup() {
       lineReadBuffer += (char)settingsFile.read();
     }
     if (logNumberBuffer.toInt() != 0) {
-      logFileNumber = logNumberBuffer.toInt();
+      Logger::logFileNumber = logNumberBuffer.toInt();
     }
     else {
-      logFileNumber = 1;
+      Logger::logFileNumber = 1;
     }
     if (lineReadBuffer.toInt() != 0) {
-      readingNumber = lineReadBuffer.toInt();
+      Logger::readingNumber = lineReadBuffer.toInt();
     }
     else {
-      readingNumber = 1;
+      Logger::readingNumber = 1;
     }
     settingsFile.close();
-    checkLogExists(logFileNumber);
+    Logger::checkLogExists();
   }
   /* check that touch screen is started propperly */
   while (true) {
@@ -106,7 +106,6 @@ void setup() {
    flickering.
 */
 void loop() {
-  Serial.println("hello");
   // Determine if the screen was touched and on which quadrant
   TS_Point touchedPoint;
   uint8_t touchedQuadrant = BTN_NONE;
@@ -142,17 +141,15 @@ void loop() {
       }
       milliseconds = millis();
       for ( int i = 0; i < 5; i++ ) {                       // get initial 5 readings
-        readings.push( sensors.getReading() );
+        readings.add( sensors.getReading() );
         while (millis() - milliseconds < READING_FREQUENCY);
         milliseconds = millis();
       }
 
-      while (!stableReadings(&readings)) {
+      while (!stableReadings(readings)) {
         milliseconds = millis();
         while ( millis() - milliseconds < READING_FREQUENCY);
-        if (readings.count() == NUMBER_OF_READINGS)
-          readings.pop();
-        readings.push( sensors.getReading() );
+        readings.add( sensors.getReading() );
       }
       deviceState = READ_STATE;
       redraw = true;
@@ -164,7 +161,7 @@ void loop() {
       }
       switch (touchedQuadrant) {
         case BTN_NE:
-          if (saveEnable) {             // if save button is pressed, save and go back to main menu
+          if (Logger::saveEnable) {             // if save button is pressed, save and go back to main menu
             deviceState = SAVE_STATE;
             redraw = true;
           }
@@ -173,18 +170,11 @@ void loop() {
           deviceState = READY_STATE;
           redraw = true;
           statusBar = "GrowthLine";
-          while (!readings.isEmpty()) { // Clear the readings list
-            readings.pop();
-            Serial.println("Emptying list");
-          }
+          readings.clear();
           break;
       }
       if ( millis() - milliseconds > READING_FREQUENCY) {   // updates displayed reading
-        if (readings.count() == NUMBER_OF_READINGS) {
-          readings.pop();
-          Serial.println("Popped a reading");
-        }
-        readings.push( sensors.getReading() );
+        readings.add( sensors.getReading() );
         milliseconds = millis();
         update_Readings();
       }
@@ -195,17 +185,14 @@ void loop() {
         redraw = false;
       }
       Serial.println("Saving log file");
-      saveLog(logFileNumber, &readingNumber, &readings, fahrenheit);
+      tempReading = readings.get_new();
+      Logger::saveLog(tempReading, fahrenheit);
       Serial.println("Log saved");
       deviceState = READY_STATE;
       redraw = true;
       statusBar = "Read Saved";
-      while (!readings.isEmpty()) {
-        Serial.println("Hi");
-        readings.pop();
-        Serial.println("popped successfuly");
-      }
-      saveSettings(logFileNumber, readingNumber, saveEnable, fahrenheit);
+      readings.clear();
+      Logger::saveSettings(fahrenheit);
       Serial.println("Entering READY_STATE");
       break;
     case MENU_STATE:
@@ -224,7 +211,7 @@ void loop() {
           statusBar = "GrowthLine";
           break;
         case BTN_SW:
-          if ( saveEnable ) {
+          if ( Logger::saveEnable ) {
             deviceState = LOG_STATE;
             redraw = true;
           }
@@ -251,7 +238,7 @@ void loop() {
           } else {
             fahrenheit = true;
           }
-          saveSettings(logFileNumber, readingNumber, saveEnable, fahrenheit);
+          Logger::saveSettings(fahrenheit);
           tempChange = true;
           break;
         case BTN_NW:
@@ -263,10 +250,11 @@ void loop() {
           redraw = true;
           break;
         case BTN_SE:
-          if (saveEnable) {
-            checkLogExists(++logFileNumber);
-            readingNumber = 1;
-            saveSettings(logFileNumber, readingNumber, saveEnable, fahrenheit);
+          if (Logger::saveEnable) {
+            Logger::logFileNumber += 1;
+            Logger::checkLogExists();
+            Logger::readingNumber = 1;
+            Logger::saveSettings(fahrenheit);
             deviceState = READY_STATE;
             redraw = true;
             statusBar = "NewLogFile";
@@ -284,7 +272,7 @@ void loop() {
         redraw = true;
       }
       else if ( touchedQuadrant == BTN_NE) {                // if go button is pressed, calibrate pH sensor
-        pH *phSensor = (pH*)sensors.getSensor(PH_SENSOR_ID);
+        pH* phSensor = (pH*)sensors.getSensor(PH_SENSOR_ID);
         phSensor->calibrate();
         deviceState = READY_STATE;
         redraw = true;
@@ -294,7 +282,7 @@ void loop() {
     case LOG_STATE:
       if (redraw) {
         String logs[5] = {"", "", "", "", ""};
-        getLogs(String("log") + logFileNumber + ".txt", logs, &currentRead);
+        Logger::getLogs(String("log") + Logger::logFileNumber + ".txt", logs, &currentRead);
         draw_LogScreen(logs);
         redraw = false;
       }
@@ -305,9 +293,9 @@ void loop() {
       }
       else if ( touchedQuadrant == BTN_NE) {
         String logs[5] = {"", "", "", "", ""};
-        getLogs(String("log") + logFileNumber + ".txt", logs, &currentRead);
+        Logger::getLogs(String("log") + Logger::logFileNumber + ".txt", logs, &currentRead);
         update_Logs(logs);
-        if (currentRead >= readingNumber)
+        if (currentRead >= Logger::readingNumber)
           currentRead = 1;
       }
       break;
@@ -424,24 +412,24 @@ void update_Readings() {
   /* Draw reading 1 - Ambient Light */
   String amb_lite    = "Amb. Lite: ";
   tft->setCursor( 20, 112);
-  tft->println(amb_lite + readings.peek().lux);
+  tft->println(amb_lite + readings.get_new().getReadValueByType(ReadType::LUX));
 
   /* Draw reading 2 - Air Temperature */
   String air_temp    = "Air Temp.: ";
   tft->setCursor( 20, 132);
   if (fahrenheit) {
-    tft->println(air_temp + cToF(readings.peek().airTemperature) + "F");
+    tft->println(air_temp + cToF(readings.get_new().getReadValueByType(ReadType::AIR_TEMP)) + "F");
   } else {
-    tft->println(air_temp + readings.peek().airTemperature + "C");
+    tft->println(air_temp + readings.get_new().getReadValueByType(ReadType::AIR_TEMP) + "C");
   }
 
   /* Draw reading 3 - Humidity */
   String humidity    = "Humidity : ";
   tft->setCursor( 20, 152);
-  tft->println(humidity + readings.peek().humidity);
+  tft->println(humidity + readings.get_new().getReadValueByType(ReadType::HUMIDITY));
 
   /* Draw reading 4 - Soil pH */
-  switch (phStatus(readings.peek().pH)) {
+  switch (phStatus(readings.get_new().getReadValueByType(ReadType::PH))) {
     case BAD_LOW:
       tft->setTextColor( ILI9341_BLUE, ILI9341_BLACK);
       break;
@@ -456,17 +444,17 @@ void update_Readings() {
   }
   String ph          = "pH       : ";
   tft->setCursor( 20, 172);
-  tft->println(ph + readings.peek().pH);
+  tft->println(ph + readings.get_new().getReadValueByType(ReadType::PH));
 
   /* Draw reading 5 - Soil moisture  */
   tft->setTextColor( ILI9341_WHITE, ILI9341_BLACK);
   String moisture    = "Moisture : ";
   tft->setCursor( 20, 192);
-  tft->println(moisture + readings.peek().moisture);
+  tft->println(moisture + readings.get_new().getReadValueByType(ReadType::MOISTURE));
 
   /* Draw rea
     ding 6 - Ground temperature */
-  switch (groundTempStatus(readings.peek().groundTemperature)) {
+  switch (groundTempStatus(readings.get_new().getReadValueByType(ReadType::GROUND_TEMP))) {
     case BAD_LOW:
       tft->setTextColor( ILI9341_BLUE, ILI9341_BLACK);
       break;
@@ -482,9 +470,9 @@ void update_Readings() {
   String ground_temp = "Gnd. Temp: ";
   tft->setCursor( 20, 212);
   if (fahrenheit) {
-    tft->println(ground_temp + cToF(readings.peek().groundTemperature) + "F");
+    tft->println(ground_temp + cToF(readings.get_new().getReadValueByType(ReadType::GROUND_TEMP)) + "F");
   } else {
-    tft->println(ground_temp + readings.peek().groundTemperature + "C");
+    tft->println(ground_temp + readings.get_new().getReadValueByType(ReadType::GROUND_TEMP) + "C");
   }
 }
 
@@ -637,6 +625,3 @@ void update_Logs(String in_array[]) {
     tft->println(in_array[i]);
   }
 }
-
-
-
